@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Experience Overview</h2>
+        <a href="{{ url_for('experiences.submit_experience') }}" class="btn btn-primary">
+            Share New Experience
+        </a>
+    </div>
+
+    {% if experiences %}
+        {% for experience in experiences %}
+        <div class="card mb-3 experience-card" data-edit-url="{{ url_for('experiences.edit_experience', experience_id=experience.id) }}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <a href="{{ url_for('experiences.edit_experience', experience_id=experience.id) }}" 
+                           class="text-dark text-decoration-none hover-underline">
+                            {{ experience.narrative_text[:100] }}...
+                        </a>
+                    </h5>
+                    <span class="badge bg-{{ 'danger' if experience.impact_severity == 'High' 
+                                        else 'warning' if experience.impact_severity == 'Medium' 
+                                        else 'info' }}">
+                        {{ experience.impact_severity }}
+                    </span>
+                </div>
+                <p class="card-text mt-2">{{ experience.current_workaround or 'No workaround documented' }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        {% for tag in experience.context_tags %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    <small class="text-muted">
+                        Shared on {{ experience.created_at.strftime('%Y-%m-%d') }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            No experiences shared yet. Be the first to share your experience!
+        </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Double-click on card to edit
+    document.querySelectorAll('.experience-card').forEach(function(card) {
+        card.addEventListener('dblclick', function () {
+            const url = card.getAttribute('data-edit-url');
+            if (url) window.location.href = url;
+        });
+    });
+});
+</script>
+
+<style>
+.hover-underline:hover {
+    text-decoration: underline !important;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>AI-Generated Requirement</h2>
+        <a href="{{ url_for('experiences.overview') }}" class="btn btn-secondary">Back to Overview</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Original Experience</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Description:</strong> {{ experience.narrative_text }}</p>
+                    <p><strong>Workaround:</strong> {{ experience.current_workaround or 'None' }}</p>
+                    <p><strong>Severity:</strong> 
+                        <span class="badge bg-{{ 'danger' if experience.impact_severity == 'High' 
+                                                else 'warning' if experience.impact_severity == 'Medium' 
+                                                else 'info' }}">
+                            {{ experience.impact_severity }}
+                        </span>
+                    </p>
+                    <p><strong>Tags:</strong> 
+                        {% for tag in experience.context_tags %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>AI-Suggested Requirement</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6>Generated Requirement:</h6>
+                        <p>{{ generated_requirement }}</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success" onclick="saveRequirement()">
+                            <i class="bi bi-check-circle"></i> Save Requirement
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="regenerateRequirement()">
+                            <i class="bi bi-arrow-repeat"></i> Regenerate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function saveRequirement() {
+    // TODO: Implement save functionality
+    alert('Save functionality to be implemented');
+}
+
+function regenerateRequirement() {
+    // TODO: Implement regenerate functionality
+    location.reload();
+}
+</script>
+{% endblock %}

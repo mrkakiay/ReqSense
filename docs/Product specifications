@@ -1,0 +1,413 @@
+## Purpose and Vision
+
+On the side of my regular jobs and assignments as requirements specialist and data management consultant, I want to uphold my knowledge and skills in developing software applications and information system components by designing and developing personal projects that can have realistic business applications.
+
+While I’m energized by the potential of these personal projects to evolve into meaningful collaborations — whether with my current employer or future partners — I remain mindful of the line between ambition and ego. My goal is not to impress, but to create tools that genuinely solve problems, reflect thoughtful design, and invite shared ownership. This page is a space to explore, refine, and build with intention.
+
+## Project Ideas
+
+Here are several project ideas that align with my goal of maintaining and sharpening my software development skills through realistic business applications:
+
+### Business-Oriented Software Projects
+
+- **Requirements Intelligence Platform**
+    
+    A web app to track requirements from stakeholder input through implementation and testing.
+    
+- **Client Onboarding Workflow System**: A business process automation tool for onboarding new clients with document uploads, approval steps, and task tracking.
+    
+
+### Data Management & Analytics Projects
+
+- **Data Quality Dashboard**: A tool that visualizes data quality metrics and alerts for anomalies.
+    
+- **Metadata Catalog Explorer**: A searchable interface for exploring metadata across datasets with tagging and lineage tracking.
+    
+
+### Skill-Expanding Projects
+
+- **AI-Powered Requirements Classifier**: An NLP tool to classify and prioritize requirements from raw stakeholder input.
+    
+- **Low-Code Business App Builder**: A drag-and-drop interface for creating simple business apps like inventory trackers or CRMs.
+    
+
+## Solution Blueprint: ReqSense — Requirements Intelligence Platform
+
+### Objective
+
+Enable small teams and consultants to trace requirements from intake to implementation, with stakeholder linkage, prioritization, and AI-powered narrative analysis.
+
+### Use Case
+
+A freelance consultant receives stakeholder input via several types of channels/sources: emai, spreadsheets, minutes from an interview etc. They need a way to organize, trace, and validate requirements without losing context or duplicating effort. The tool allows them to:
+
+- Capture requirements from multiple sources
+    
+- Link each requirement to stakeholders and rationale
+    
+- Prioritize collaboratively
+    
+- Track implementation and testing status
+    
+
+### Design Narrative
+
+**Scenario Walkthrough**
+
+Sarah receives an email from a stakeholder mentioning "we need better reporting" and "users complain about lag." She forwards it to the tool, which extracts two candidate requirements: one for enhanced reporting and one for performance improvement. The system suggests linking the reporting item to the existing 'Reporting' module and flags the 'lag' issue as potentially related to a performance requirement logged last month. Sarah confirms the link, adds a priority tag to both items, and the system updates the traceability matrix automatically — preserving context, reducing rework, and reinforcing stakeholder alignment.
+
+A repeated pain point across organizations is the need to reuse existing stakeholder input and previously defined requirements. Redoing work that has already been done — whether it's revalidating, reclassifying, or re-entering — is a major source of frustration and inefficiency. This tool is designed to minimize that friction by enabling smart reuse, traceability, and contextual linking of past decisions.
+
+The system is designed to ingest both structured and unstructured sources of input. While the MVP focuses on form submissions, spreadsheets, and standardized templates, the architecture is intentionally designed to support future extensions — including database connections, API integrations, and other forms of interoperability. This ensures that the solution can evolve into a more connected ecosystem without requiring major redesign. Structured data includes form submissions, spreadsheets, and standardized templates. Unstructured input refers to non-standard formatted text such as stakeholder emails, typed meeting minutes, and freeform notes. While scans or photos are out of scope, the tool uses AI-powered parsing to extract potential requirements, stakeholder references, and prioritization cues from these textual sources. This ensures that valuable insights are not lost simply because they weren’t captured in a formal format — preserving context and reducing the need to re-enter or revalidate information.
+
+### Epics Table
+
+|Epic ID|Epic Name|Description|
+|---|---|---|
+|EPIC-001|Requirement Intake|Capture structured and unstructured input via forms and email parsing|
+|EPIC-002|Stakeholder Directory & Linkage|Assign roles, ownership, and rationale to requirements|
+|EPIC-003|Prioritization Engine|Apply MoSCoW tagging and weighted scoring|
+|EPIC-004|Traceability Matrix|Link requirements to tasks, tests, and status|
+|EPIC-005|AI Narrative Analyzer|Detect gaps, assumptions, and risks in requirement stories|
+|EPIC-006|Living Documentation Agent|Prompt for missing info and track change history|
+|EPIC-007|Integration Architecture|Prepare for API/database interoperability and interface contracts|
+
+### Features Table
+
+|Feature ID|Feature Name|Linked Epic|Description|
+|---|---|---|---|
+|FEAT-001|Form builder|EPIC-001|UI for structured requirement intake|
+|FEAT-002|
+|FEAT-003|Role assignment|EPIC-002|Assign stakeholder roles to requirements|
+|FEAT-004|Ownership tracking|EPIC-002|Track who owns or validates each requirement|
+|FEAT-005|MoSCoW tagging|EPIC-003|Tag requirements by priority level|
+|FEAT-006|Weighted scoring logic|EPIC-003|Apply scoring to prioritize requirements|
+|FEAT-007|Requirement-to-task linking|EPIC-004|Connect requirements to implementation tasks|
+|FEAT-008|Status tracking|EPIC-004|Monitor progress and testing status|
+|FEAT-009|Gap detection|EPIC-005|Identify missing logic or assumptions|
+|FEAT-010|Risk estimation|EPIC-005|Flag potential risks in requirement narratives|
+|FEAT-011|Prompting logic|EPIC-006|Suggest missing info or escalate unclear items|
+|FEAT-012|Change history tracking|EPIC-006|Log edits and updates to requirements|
+|FEAT-013|API endpoint scaffolding|EPIC-007|Prepare for future API integration|
+|FEAT-014|Interface contract definitions|EPIC-007|Define data exchange formats and protocols|
+|FEAT-015|Data sync logic (future)|EPIC-007|Enable future database connectivity|
+
+### Requirements Interpretation Table
+
+To reflect Claude LLM's feedback, this table now includes requirement IDs, priority tags, and additional mappings from the epics. These refinements improve traceability and prepare the dataset for use in the tool's own intake module.
+
+|ID|Source|Extracted Requirement|Type|Linked Epic|Priority|
+|---|---|---|---|---|---|
+|REQ-FUNC-001|Scenario Walkthrough|Extract requirements from email|Functional|EPIC-001|High|
+|REQ-FUNC-002|Scenario Walkthrough|Link requirement to module|Functional|EPIC-004|High|
+|REQ-FUNC-003|Scenario Walkthrough|Flag related past requirements|Functional|EPIC-005|Medium|
+|REQ-FUNC-004|Design Narrative|Support structured input (forms, spreadsheets)|Functional|EPIC-001|High|
+|REQ-FUNC-005|Design Narrative|Support unstructured input (emails, notes)|Functional|EPIC-001|High|
+|REQ-NONFUNC-001|Design Narrative|Enable reuse of past input|Non-functional|EPIC-004|High|
+|REQ-ARCH-001|Design Narrative|Support future API/database integration|Architectural|EPIC-007|Medium|
+|REQ-NONFUNC-002|Feedback Loop|External reviewer for logic gaps|Non-functional|EPIC-005|Medium|
+|REQ-FUNC-006|Epic 3|MoSCoW tagging and weighted scoring|Functional|EPIC-003|High|
+|REQ-FUNC-007|Epic 4|Status tracking|Functional|EPIC-004|High|
+|REQ-FUNC-008|Epic 6|Change history tracking|Functional|EPIC-006|Medium|
+
+# Design Tooling
+
+Via Reddit found: [https://www.reddit.com/r/DomainDrivenDesign/comments/1nzoeuo/i_created_an_opensource_toolbox_for_domaindriven/](https://www.reddit.com/r/DomainDrivenDesign/comments/1nzoeuo/i_created_an_opensource_toolbox_for_domaindriven/)
+
+Domain driven design: [https://github.com/poulainpi/ddd-toolbox?tab=readme-ov-file](https://github.com/poulainpi/ddd-toolbox?tab=readme-ov-file)
+
+Event Storming: A collaborative modeling technique useful in Domain-Driven Design. It helps uncover domain events, processes, and actors early in the design phase. This visual flowchart outlines the idea intake process:
+
+![Event Storming Flowchart]
+
+**Flowchart Steps:**
+
+- Stakeholder provides a wish or idea
+    
+- The idea is registered
+    
+- The idea must be evaluated for eligibility
+    
+
+This tool supports early-stage requirement discovery and aligns well with your intake and traceability goals. More info: [https://dddtoolbox.com/event-storming](https://dddtoolbox.com/event-storming)
+
+
+# Feature Details
+
+#### FEAT-001: Form Builder
+
+**Purpose:** Enable structured intake of stakeholder wishes, ideas, and requirement candidates via web form and lightweight upload endpoints so that submissions are consistently registered and ready for interpretation.
+
+Summary of behavior
+
+- Input: raw stakeholder input (email text, transcript, free-text wish) plus basic metadata (sender, source, priority hint).
+    
+- Process: validate required fields, generate RequirementSubmission id, store submission, emit WishSubmitted event, and mark submission status as Registered.
+    
+- Outcomes: RequirementSubmission objects stored with metadata, initial eligibility check (eligible / needs-clarification), and events to trigger FEAT-002 (Interpretation & Extraction Engine).
+    
+- Idempotency: submission handling must be idempotent (duplicate-submission detection) and link all events to the originating submission id.
+    
+
+Primary user stories
+
+1. As a requirements analyst, I want to paste an email or transcript and include metadata so that the system can register the wish for later extraction.
+    
+2. As a requirements analyst, I want the form to auto-generate a unique requirement submission id so that each intake is traceable.
+    
+3. As a requirements analyst, I want the form to run a basic eligibility check so that clearly invalid or out-of-scope submissions are flagged immediately.
+    
+4. As a stakeholder, I want to submit a wish without needing to know internal taxonomy so that contributors can provide input easily.
+    
+5. As an integrator, I want a simple POST endpoint for submissions so that automated systems can feed wishes into ReqSense.
+    
+
+Domain events / commands / aggregates
+
+- Commands: SubmitWishForm; ValidateSubmissionMetadata; MarkSubmissionEligible.
+    
+- Domain Events: WishSubmitted; SubmissionValidated; SubmissionMarkedEligible; SubmissionFlaggedForClarification; RequirementIDGenerated.
+    
+- Aggregates: **RequirementSubmission** (root; original text, metadata, eligibility status); **Stakeholder** (reference; optional link).
+    
+
+Acceptance criteria (MVP)
+
+- Given a filled form, when submitted, then the system stores a RequirementSubmission with a unique id and emits WishSubmitted referencing that id.
+    
+- Given missing required fields, when submitted, then the system returns validation feedback and does not create a RequirementSubmission.
+    
+- Given a submission, when eligibility rules pass, then SubmissionMarkedEligible is emitted; otherwise SubmissionFlaggedForClarification is emitted and placed in a clarification queue.
+    
+- Submissions must include source reference, sender identity (if provided), timestamp, and source_type.
+    
+
+Business rules / policies (MVP)
+
+- Required fields: submission_text, sender_name or sender_email, source_type.
+    
+- Eligibility rules: minimum length/intent heuristics, no forbidden content, and presence of at least one actionable verb or objective.
+    
+- Duplicate detection: minor text similarity heuristic to avoid accidental double-submissions within a short window (e.g., 5 minutes).
+    
+- Privacy rule: source emails may be stored masked if privacy mode enabled.
+    
+
+UX hooks and workflow
+
+- Intake form with fields: submission text, sender name, sender email, source type, priority hint, linked module (optional).
+    
+- Confirmation page showing generated RequirementSubmission id and next steps (e.g., “Your wish is queued for interpretation”).
+    
+- Clarification workflow link for flagged submissions allowing analyst to request more info or edit the submission.
+    
+- Webhook / API response returning RequirementSubmission id for programmatic submitters.
+    
+
+Non-functional considerations
+
+- Synchronous submission response must be fast (< 500ms) while interpretation runs asynchronously.
+    
+- Store original submission immutable and ensure audit trail for edits/clarifications.
+    
+- Input sanitization and size limits; support for attachments only as references (not stored in MVP).
+    
+
+Minimal test scenarios
+
+- Valid email submission creates RequirementSubmission and emits WishSubmitted.
+    
+- Missing sender email returns validation error.
+    
+- Short, non-actionable text is flagged for clarification.
+    
+- Rapid duplicate submissions are deduplicated and return same RequirementSubmission id.
+    
+
+Backlog / next steps (priority)
+
+1. Define RequirementSubmission schema fields and storage layout.
+    
+2. Design API contract for programmatic submissions (POST /submissions).
+    
+3. Implement eligibility heuristics and thresholds.
+    
+4. Create UI mock for confirmation and clarification flows.
+    
+5. Add privacy / masking options for sensitive submissions.
+    
+
+Additional Clarification for FEAT-001
+
+- Purpose refinement: Form Builder captures raw stakeholder input and produces an immutable RequirementSubmission object that is the single source of truth for that intake. It does not interpret intent beyond lightweight eligibility heuristics; interpretation is strictly deferred to FEAT-002.
+    
+- Submission lifecycle states: Draft → Submitted → Registered → Eligible | FlaggedForClarification. Each state must be recorded on the RequirementSubmission with timestamps and actor (system or user).
+    
+- Minimal canonical fields to persist: submission_id, submission_text, sender_name, sender_email, source_type, priority_hint, linked_module, status, created_at, updated_at, provenance. Provenance must include raw payload and form version.
+    
+- Validation versus eligibility: validation is syntactic (required fields, email format, length limits). eligibility is semantic (intent detection, actionable verb heuristic) and may set status to FlaggedForClarification when failed.
+    
+- Duplicate handling policy (MVP): short-window dedupe returns existing submission_id for near-identical texts submitted within 5 minutes; otherwise present suggested existing matches for analyst review.
+    
+- Notifications and hooks: on WishSubmitted emit domain event with submission_id; expose synchronous API response containing submission_id and an async webhook option for downstream consumers.
+    
+- Privacy option: include a boolean privacy_mask flag; when true, store masked sender_email and record masking method in provenance.
+    
+- Audit and immutability: original submission_text must be immutable; clarifications or edits create a new revision record linked to the original submission_id but do not overwrite raw input.
+    
+
+#### FEAT-002: Interpretation & Extraction Engine
+
+**Purpose:** Interpretation & Extraction Engine consumes registered wishes (emails, form submissions, transcripts), extracts candidate requirement statements, normalizes metadata, detects duplicates, and flags ambiguous submissions for human review.
+
+Summary of behavior
+
+- Input: a registered wish (RequirementSubmission) with text and metadata.
+    
+- Process: asynchronous interpretation pipeline that produces CandidateRequirement objects with confidence scores and suggested tags.
+    
+- Outcomes: CandidateRequirementExtracted events for each candidate, CandidateMarkedAmbiguous for unclear inputs, and Review Queue items for human validation.
+    
+- Idempotency: all processing must be idempotent and linked to the originating RequirementSubmission id.
+    
+
+Primary user stories
+
+1. As a requirements analyst, I want the system to extract candidate requirement sentences from a submitted wish so that I can review and confirm structured requirements.
+    
+2. As a requirements analyst, I want the system to tag extracted candidates with likely priority, affected module, and stakeholder so that I can quickly triage new items.
+    
+3. As a requirements analyst, I want ambiguous or incomplete extractions to be flagged and routed to a review queue so that nothing is falsely registered.
+    
+4. As a tester, I want the engine to link extracted requirements to the original submission and include confidence scores so that I can trace back and assess verification scope.
+    
+5. As a product owner, I want duplicate or near-duplicate candidate requirements suggested so that similar asks can be merged or linked.
+    
+
+Domain events / commands / aggregates
+
+- Commands: SubmitWishForInterpretation; ConfirmExtractedRequirement; RejectExtractedRequirement; MergeDuplicateCandidates.
+    
+- Domain Events: WishSubmitted; InterpretationStarted; CandidateRequirementExtracted; CandidateRequirementTagged; CandidateMarkedAmbiguous; CandidateStoredForReview; RequirementExtractionConfirmed.
+    
+- Aggregates: **RequirementSubmission** (root; original text, metadata, status); **CandidateRequirement** (root; extracted statement, confidence, tags, links); **Requirement** (canonical, once confirmed).
+    
+
+Acceptance criteria (MVP)
+
+- Given a registered wish with clear intent, when the engine runs, then it emits at least one CandidateRequirementExtracted with confidence >= threshold and links it to the original submission.
+    
+- Given a wish lacking essential context, when the engine runs, then it emits a CandidateMarkedAmbiguous and places the submission in the review queue.
+    
+- Given two submissions with highly similar extracted statements, when the engine runs, then it suggests a possible duplicate link and returns similarity score.
+    
+- Each candidate extraction must include: extracted text, confidence score, suggestedPriority, suggestedModule, suggestedStakeholder, sourceSubmissionId, and excerpt.
+    
+- All events must be idempotent and reference the originating RequirementSubmission id.
+    
+
+Business rules / policies (MVP)
+
+- If confidence >= 0.80 → auto-create CandidateRequirement and mark “ready for analyst review.”
+    
+- If confidence between 0.50 and 0.80 → create CandidateRequirement with status “needs human validation.”
+    
+- If confidence < 0.50 or missing required metadata → create CandidateMarkedAmbiguous and route to review queue.
+    
+- If similarity >= 0.85 with existing requirement → suggest duplicate link instead of auto-creating a new canonical requirement.
+    
+
+UX hooks and reviewer workflow
+
+- Interpretation results panel on the submission page showing extracted candidates with inline actions: Accept, Reject, Edit, Merge.
+    
+- Filterable review queue views: Ambiguous, Low-confidence, Duplicate-suggestions.
+    
+- Quick actions: accept-as-requirement (creates Requirement and emits RequirementExtractionConfirmed), send-back-to-analyst with comment, merge-with-existing.
+    
+
+Non-functional considerations
+
+- Processing must be asynchronous with clear status lifecycle: queued → running → completed/failed.
+    
+- Extraction must be auditable and reversible; keep original submission and candidate versions.
+    
+- Confidence scoring models must be versioned and upgradeable without breaking historical traceability.
+    
+- System must guarantee idempotent event emission and safe retries.
+    
+
+Minimal test scenarios
+
+- Clear email produces one high-confidence candidate linked to submission.
+    
+- Vague email produces CandidateMarkedAmbiguous and review queue item.
+    
+- Two similar emails produce duplicate suggestion with similarity score.
+    
+- Accepting a candidate emits RequirementExtractionConfirmed and creates Requirement aggregate.
+    
+
+Backlog / next steps (priority)
+
+1. Define CandidateRequirement schema and required fields.
+    
+2. Design InterpretationStarted and CandidateRequirementExtracted event schemas.
+    
+3. Sketch reviewer UI and quick-action flows.
+    
+4. Define confidence thresholds and similarity metrics for MVP.
+    
+5. Create a test dataset (10–20 submissions) covering clear, vague, and duplicate cases.
+    
+6. Define async processing contract, retry and idempotency rules.
+    
+7. Provide sample event payloads for integration testing.
+    
+
+Additional Clarification for FEAT-002
+
+- Role separation: FEAT-002 is the authoritative interpreter that converts RequirementSubmission(s) into CandidateRequirement entities; it is the only feature that applies NLP/ML models and confidence thresholds to produce extraction artifacts.
+    
+- Processing contract: each interpretation run must be idempotent and produce one InterpretationRun record with run_id, submission_id, model_version, start_ts, end_ts, status plus produced candidate ids. Re-running the same model_version on the same submission must not create duplicate CandidateRequirement entries.
+    
+- CandidateRequirement canonical fields: candidate_id, candidate_text, confidence, suggested_priority, suggested_module, suggested_stakeholder, source_submission_id, excerpt, model_version, created_at, status. Status values: proposed, needs_validation, ambiguous, merged, confirmed, rejected.
+    
+- Confidence handling and routing: confidence thresholds are configurable per environment but default to the business rules already defined. Low-confidence or ambiguous candidates create ReviewQueueItem entries with rationale and required clarifying question templates for analysts.
+    
+- Duplicate detection flow: run vector-similarity against existing confirmed Requirements and open CandidateRequirements; if similarity >= duplicate threshold produce a DuplicateSuggestion artifact containing candidate_id, matched_id, similarity_score, and suggested_action (link | merge | ignore).
+    
+- Human-in-the-loop actions and audit: analyst actions (accept, edit, reject, merge) must emit domain events and be recorded with actor id, timestamp, and change diff. Accepting a candidate creates a Requirement aggregate and emits RequirementExtractionConfirmed.
+    
+- Model governance: every candidate must record model_version and confidence calibration metadata; UI must surface model_version and confidence for reviewer transparency. Model upgrades require migration strategy for historical candidates (retain original model_version; optionally flag for re-interpretation).
+    
+- Error and retry semantics: interpretation jobs must be queued with retry policy and exponential backoff; failures emit InterpretationFailed events with error codes and brief diagnostic metadata; manual retry must be available from the analyst UI.
+    
+- Performance expectations: process submissions asynchronously; typical interpretation latency target for MVP 95th percentile < 10 seconds after dequeue; ensure queueing and backpressure handling for bulk imports.
+    
+
+Acceptance and Traceability Notes
+
+- Traceability requirement: every produced artifact (RequirementSubmission, CandidateRequirement, Requirement) must contain links to its source ids and a chain of domain events enabling full causal reconstruction.
+    
+- Event idempotency: events must include deterministic event ids derived from submission_id + run_id + artifact type to avoid duplicate side effects across retries.
+    
+- Test dataset guidance: supply 10–20 varied submission examples covering clear statements, conditional requests, ambiguous asks, multi-intent emails, and duplicates to validate thresholds, excerpt heuristics, and review flows.
+    
+
+UX and Reviewer Workflow Clarification
+
+- Interpretation panel: show candidates ranked by confidence with inline model_version and quick-actions: Accept, Edit, Reject, Merge, Ask Clarifying Question. Provide one-click creation of Requirement from accepted candidate.
+    
+- Review queue filters: Ambiguous | Low Confidence | Duplicate Suggestions | Re-run Interpretations. Each queue item must display provenance and suggested clarifying question templates.
+    
+- Clarification feedback loop: when analyst requests clarification, link a ClarificationRequest record to submission_id and set submission status to AwaitingClarification; incoming clarification updates should create a new revision and retrigger FEAT-002 automatically.
+    
+
+Integration and Next Steps Clarification
+
+- API contracts: document POST /submissions returning submission_id; POST /interpretations or event-driven InterpretationRequested consumed by FEAT-002; standardize event payloads for InterpretationStarted and CandidateRequirementExtracted with the fully specified fields.
+    
+- Backlog priorities: finalize schemas for RequirementSubmission and CandidateRequirement; design InterpretationRun and ReviewQueueItem entities; prepare the 10–20 test submissions; draft example event payloads for integration tests.
+    
+- Deliverable for code LLM: provide the JSON schemas, sample payloads, and the idempotent event id generation rule (e.g., sha256(requirement_submission_id + model_version + run_timestamp)).

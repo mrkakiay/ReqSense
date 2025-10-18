@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Share Your Experience</h2>
+    
+    <form method="POST" action="{{ url_for('experiences.submit_experience') }}">
+        <div class="mb-3">
+            <label for="narrative_text" class="form-label">Experience Description</label>
+            <textarea class="form-control" id="narrative_text" name="narrative_text" 
+                      rows="5" required></textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="current_workaround" class="form-label">Current Workaround (if any)</label>
+            <textarea class="form-control" id="current_workaround" name="current_workaround" 
+                      rows="3"></textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="impact_severity" class="form-label">Impact Severity</label>
+            <select class="form-control" id="impact_severity" name="impact_severity" required>
+                <option value="">Select severity...</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="context_tags" class="form-label">Context Tags</label>
+            <input type="text" class="form-control" id="context_tags" name="context_tags" 
+                   placeholder="performance, usability, backend (comma-separated)">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Submit Experience</button>
+        <a href="{{ url_for('experiences.overview') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

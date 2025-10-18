@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Welcome to ReqSense</h1>
+    <p>Paste an email, transcript, or free-text wish below and provide optional metadata. The system will register the submission and run a basic eligibility check.</p>
+
+    <form action="{{ url_for('submit_form') }}" method="POST" class="main-form">
+        <div class="form-group">
+            <label for="submission_text">Submission Text (required):</label>
+            <textarea id="submission_text" name="submission_text" rows="6" required></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="sender_name">Sender name (optional):</label>
+                <input type="text" id="sender_name" name="sender_name">
+            </div>
+            <div class="form-group">
+                <label for="sender_email">Sender email (optional):</label>
+                <input type="email" id="sender_email" name="sender_email">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="source_type">Source type:</label>
+                <select id="source_type" name="source_type">
+                    <option value="form">Form</option>
+                    <option value="email">Email</option>
+                    <option value="transcript">Transcript</option>
+                    <option value="spreadsheet">Spreadsheet</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="priority_hint">Priority hint (optional):</label>
+                <select id="priority_hint" name="priority_hint">
+                    <option value="">--</option>
+                    <option value="must">Must</option>
+                    <option value="should">Should</option>
+                    <option value="could">Could</option>
+                    <option value="wont">Won't</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="linked_module">Linked module (optional):</label>
+            <input type="text" id="linked_module" name="linked_module" placeholder="e.g. Reporting">
+        </div>
+
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="privacy_mask" value="1"> Mask sender email (privacy mode)
+            </label>
+        </div>
+
+        <button type="submit" class="btn-submit">Submit Wish</button>
+    </form>
+</div>
+
+<!-- Warning modal -->
+<div id="warningModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div style="background:var(--surface); padding:20px; border-radius:6px; width:90%; max-width:480px;">
+        <h3 id="modalTitle">Warning</h3>
+        <p id="modalMessage"></p>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+            <button id="modalRetry" class="btn btn-outline">Retry</button>
+            <button id="modalIgnore" class="btn btn-danger">Ignore & Submit</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation modal -->
+<div id="confirmModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div style="background:var(--surface); padding:18px; border-radius:6px; width:96%; max-width:680px;">
+        <h3>Confirm submission</h3>
+        <p>Please review the information below before confirming your submission.</p>
+        <div id="confirmSummary" style="margin-top:12px; font-size:14px; color:var(--brand-dark);"></div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+            <button id="confirmCancel" class="btn btn-outline">Cancel</button>
+            <button id="confirmSubmit" class="btn btn-primary">Confirm & Submit</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const form = document.querySelector('.main-form');
+    const modal = document.getElementById('warningModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalRetry = document.getElementById('modalRetry');
+    const modalIgnore = document.getElementById('modalIgnore');
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmSummary = document.getElementById('confirmSummary');
+    const confirmCancel = document.getElementById('confirmCancel');
+    const confirmSubmit = document.getElementById('confirmSubmit');
+
+    let lastFormData = null;
+
+    function showModal(message){
+        modalMessage.textContent = message;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal(){
+        modal.style.display = 'none';
+    }
+
+    function showConfirm(summaryHtml){
+        confirmSummary.innerHTML = summaryHtml;
+        confirmModal.style.display = 'flex';
+    }
+
+    function hideConfirm(){
+        confirmModal.style.display = 'none';
+    }
+
+    // Intercept submit: show confirmation modal first
+    form.addEventListener('submit', function(e){
+        e.preventDefault();
+        const data = new FormData(form);
+        lastFormData = data;
+
+            // HTML escape helper
+            function escapeHtml(unsafe){
+                if(!unsafe) return '';
+                return unsafe.replace(/[&<"'>]/g, function(m){
+                    switch(m){
+                        case '&': return '&amp;';
+                        case '<': return '&lt;';
+                        case '>': return '&gt;';
+                        case '"': return '&quot;';
+                        case "'": return '&#39;';
+                        default: return m;
+                    }
+                });
+            }
+
+            // Build a summary for confirmation
+        const summary = [];
+        const get = (k) => data.get(k) || '';
+        summary.push('<strong>Submission text</strong><div style="margin-top:4px; margin-bottom:8px;">' + escapeHtml(get('submission_text')).replace(/\n/g, '<br>') + '</div>');
+        summary.push('<strong>Sender</strong> ' + escapeHtml(get('sender_name')) + (get('sender_email') ? ' &middot; ' + escapeHtml(get('sender_email')) : ''));
+        summary.push('<strong>Source</strong> ' + escapeHtml(get('source_type')) + ' &middot; <strong>Priority</strong> ' + escapeHtml(get('priority_hint')));
+        if(get('linked_module')) summary.push('<strong>Linked module</strong> ' + escapeHtml(get('linked_module')));
+        if(get('privacy_mask')) summary.push('<em>Privacy mode: sender email will be masked</em>');
+
+        showConfirm(summary.join('<div class="mb-8"></div>'));
+    });
+
+    // Cancel on confirmation
+    confirmCancel.addEventListener('click', function(){
+        hideConfirm();
+    });
+
+    // Confirm: perform the same AJAX submit flow as before
+    confirmSubmit.addEventListener('click', function(){
+        hideConfirm();
+        if(!lastFormData) return;
+        fetch(form.action, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            body: lastFormData
+        }).then(r => r.json()).then(json => {
+            if(json.status === 'warning'){
+                // show warning modal if server returns warning
+                showModal(json.reason || 'Warning from server');
+            } else if(json.status === 'success'){
+                window.location.href = '/';
+            } else {
+                form.submit();
+            }
+        }).catch(err => {
+            console.error('Submission error', err);
+            form.submit();
+        });
+    });
+
+    modalRetry.addEventListener('click', function(){
+        hideModal();
+        // do nothing, user stays on form to edit
+    });
+
+    modalIgnore.addEventListener('click', function(){
+        hideModal();
+        if(!lastFormData) return;
+        // append force_submit flag
+        lastFormData.set('force_submit', '1');
+        fetch(form.action, {
+            method: 'POST',
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+            body: lastFormData
+        }).then(r => r.json()).then(json => {
+            // on success, redirect to index
+            window.location.href = '/';
+        }).catch(err => {
+            console.error('Forced submit failed', err);
+            window.location.href = '/';
+        });
+    });
+});
+</script>
+{% endblock %}

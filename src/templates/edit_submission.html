@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Edit Requirement</h1>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label>Requirement Text</label>
+            <textarea name="submission_text" required>{{ requirement.submission_text }}</textarea>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Priority</label>
+                <select name="priority" required>
+                    <option value="High" {% if requirement.priority == 'High' %}selected{% endif %}>High</option>
+                    <option value="Medium" {% if requirement.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option value="Low" {% if requirement.priority == 'Low' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status" required>
+                    <option value="Submitted" {% if requirement.status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                    <option value="In Progress" {% if requirement.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                    <option value="Approved" {% if requirement.status == 'Approved' %}selected{% endif %}>Approved</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Impact Level</label>
+                <select name="impact_level">
+                    <option value="High" {% if requirement.impact_level == 'High' %}selected{% endif %}>High</option>
+                    <option value="Medium" {% if requirement.impact_level == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option value="Low" {% if requirement.impact_level == 'Low' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Verification Method</label>
+                <select name="verification_method">
+                    <option value="Unit Test" {% if requirement.verification_method == 'Unit Test' %}selected{% endif %}>Unit Test</option>
+                    <option value="Integration Test" {% if requirement.verification_method == 'Integration Test' %}selected{% endif %}>Integration Test</option>
+                    <option value="System Test" {% if requirement.verification_method == 'System Test' %}selected{% endif %}>System Test</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group mt-8">
+            <button type="submit" class="btn btn-primary">Update Requirement</button>
+            <a href="{{ url_for('traceability_matrix') }}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

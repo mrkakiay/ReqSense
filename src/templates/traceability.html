@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="traceability-container">
+    <h2>Requirements Traceability Matrix</h2>
+    
+    <!-- Filter controls -->
+    <div class="filters mb-4">
+        <form method="GET" class="form-inline">
+            <select name="priority" class="form-select">
+                <option value="">All Priorities</option>
+                <option value="High" {% if filters.get('priority') == 'High' %}selected{% endif %}>High</option>
+                <option value="Medium" {% if filters.get('priority') == 'Medium' %}selected{% endif %}>Medium</option>
+                <option value="Low" {% if filters.get('priority') == 'Low' %}selected{% endif %}>Low</option>
+            </select>
+            
+            <select name="status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="In Progress" {% if filters.get('status') == 'In Progress' %}selected{% endif %}>In Progress</option>
+                <option value="Approved" {% if filters.get('status') == 'Approved' %}selected{% endif %}>Approved</option>
+                <option value="Submitted" {% if filters.get('status') == 'Submitted' %}selected{% endif %}>Submitted</option>
+            </select>
+            
+            <select name="stakeholder" class="form-select">
+                <option value="">All Stakeholders</option>
+                {% for stakeholder in stakeholders %}
+                <option value="{{ stakeholder.name }}" {% if filters.get('stakeholder') == stakeholder.name %}selected{% endif %}>
+                    {{ stakeholder.name }}
+                </option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            {% if filters %}
+            <a href="{{ url_for('traceability_matrix') }}" class="btn btn-secondary">Clear Filters</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="matrix-table-container">
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th class="col-id">ID</th>
+                    <th class="col-req">Requirement</th>
+                    <th class="col-priority">Priority</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-stakeholders">Stakeholders</th>
+                    <th class="col-deps">Dependencies</th>
+                    <th class="col-impact">Impact</th>
+                    <th class="col-verify">Verification</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requirements %}
+                <tr class="requirement-row" data-id="{{ req.submission_id }}" title="Double-click to edit">
+                    <td class="cell-id">{{ req.submission_id }}</td>
+                    <td class="cell-req">{{ req.submission_text }}</td>
+                    <td class="cell-priority">
+                        {% if req.priority %}
+                            <span class="badge bg-{{ req.priority|lower }}">
+                                {{ req.priority }}
+                            </span>
+                        {% endif %}
+                        {% if req.priority_hint %}
+                            <span class="badge bg-hint" title="Priority Hint from Submission">
+                                {{ req.priority_hint }}
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="cell-status">
+                        <span class="badge {% if req.status == 'In Progress' %}bg-warning
+                                         {% elif req.status == 'Approved' %}bg-success
+                                         {% else %}bg-secondary{% endif %}">
+                            {{ req.status }}
+                        </span>
+                    </td>
+                    <td class="cell-stakeholders">
+                        {% for stakeholder in req.stakeholders %}
+                        <span class="badge bg-info stakeholder-badge" 
+                              title="{{ stakeholder.role }} - {{ stakeholder.department }}">
+                            {{ stakeholder.name }}
+                        </span>
+                        {% endfor %}
+                    </td>
+                    <td class="cell-deps">
+                        {% for dep in req.dependencies %}
+                        <a href="#{{ dep.submission_id }}" 
+                           class="badge bg-secondary dependency-badge">
+                            {{ dep.submission_id }}
+                        </a>
+                        {% endfor %}
+                    </td>
+                    <td class="cell-impact">{{ req.impact_level }}</td>
+                    <td class="cell-verify">{{ req.verification_method }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.requirement-row').forEach(row => {
+    row.addEventListener('dblclick', function() {
+        const submissionId = this.dataset.id;
+        window.location.href = `/edit/${submissionId}`;
+    });
+});
+</script>
+{% endblock %}

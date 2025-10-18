@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Edit Experience</h2>
+    
+    <form method="POST">
+        <div class="mb-3">
+            <label for="narrative_text" class="form-label">Experience Description</label>
+            <textarea class="form-control" id="narrative_text" name="narrative_text" 
+                      rows="5" required>{{ experience.narrative_text }}</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="current_workaround" class="form-label">Current Workaround (if any)</label>
+            <textarea class="form-control" id="current_workaround" name="current_workaround" 
+                      rows="3">{{ experience.current_workaround }}</textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="impact_severity" class="form-label">Impact Severity</label>
+            <select class="form-control" id="impact_severity" name="impact_severity" required>
+                <option value="Low" {% if experience.impact_severity == 'Low' %}selected{% endif %}>Low</option>
+                <option value="Medium" {% if experience.impact_severity == 'Medium' %}selected{% endif %}>Medium</option>
+                <option value="High" {% if experience.impact_severity == 'High' %}selected{% endif %}>High</option>
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="context_tags" class="form-label">Context Tags</label>
+            <input type="text" class="form-control" id="context_tags" name="context_tags" 
+                   value="{{ experience.context_tags|join(',') }}"
+                   placeholder="performance, usability, backend (comma-separated)">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{{ url_for('experiences.overview') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
