@@ -4,162 +4,49 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{% block title %}ReqSense{% endblock %}</title>
+
+  <!-- Shared visual styles for cards/tables/buttons -->
   <style>
-    /* Enhanced global UI + navbar */
-    :root{
-      --accent:#0d6efd;
-      --muted:#6c757d;
-      --card-bg:#ffffff;
-      --surface:#f8fafc;
-      --glass: rgba(255,255,255,0.06);
-      --shadow: 0 6px 18px rgba(13,110,253,0.08);
-      --radius:12px;
-      --badge-bg:#eef2ff;
-    }
-    html,body{height:100%}
-    body{
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      margin:0;
-      background: linear-gradient(180deg,#f6f8fb 0%, #ffffff 60%);
-      color:#0f1724;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-    }
+    :root{--accent:#0d6efd;--muted:#6c757d;--card:#fff;--radius:12px}
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;margin:0;background:linear-gradient(#f6f8fb,#fff)}
+    .topnav{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1rem;background:linear-gradient(90deg,var(--accent),#1467ff);color:#fff;box-shadow:0 8px 30px rgba(13,110,253,.08);position:sticky;top:0;z-index:40}
+    .brand{font-weight:800}
+    .nav-links{display:flex;gap:.5rem}
+    .nav-links a{color:#fff;text-decoration:none;padding:.45rem .7rem;border-radius:8px;font-weight:600}
+    .nav-links a.active{background:rgba(255,255,255,.08)}
 
-    .topnav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0.6rem 1rem;
-      background: linear-gradient(90deg,var(--accent), #1467ff);
-      color:#fff;
-      box-shadow: 0 8px 30px rgba(13,110,253,0.12);
-      position:sticky;
-      top:0;
-      z-index:40;
-      backdrop-filter: blur(6px);
-    }
-    .brand{
-      font-weight:800;
-      letter-spacing:0.25px;
-      display:flex;
-      gap:.6rem;
-      align-items:center;
-    }
-    .brand::before{
-      content:"";
-      width:36px;height:36px;border-radius:8px;
-      background:linear-gradient(135deg,#fff,rgba(255,255,255,0.85));
-      box-shadow: inset 0 -6px 18px rgba(13,110,253,0.06);
-    }
-
-    .nav-links{display:flex;gap:0.5rem;align-items:center}
-    .nav-links a{
-      color:rgba(255,255,255,0.95);
-      text-decoration:none;
-      padding:0.42rem 0.8rem;
-      border-radius:8px;
-      position:relative;
-      transition:transform .15s ease, background .12s ease;
-      font-weight:600;
-      font-size:.95rem;
-    }
-    .nav-links a:hover{transform:translateY(-3px)}
-    .nav-links a.active{background: rgba(255,255,255,0.08)}
-    .nav-links a::after{content:"";position:absolute;left:12%;right:12%;bottom:8px;height:2px;background:rgba(255,255,255,0.9);transform:scaleX(0);transform-origin:left center;transition:transform .18s}
-    .nav-links a:hover::after,.nav-links a.active::after{transform:scaleX(1)}
-
-    /* container */
     .container{max-width:1120px;margin:1.25rem auto;padding:0 1rem}
+    .table-card{background:var(--card);border-radius:var(--radius);box-shadow:0 8px 26px rgba(13,110,253,.06);overflow:hidden;margin-bottom:1.25rem;border:1px solid rgba(15,23,36,0.04)}
+    .table-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1rem;border-bottom:1px solid rgba(15,23,36,0.04)}
+    .table-header h2{margin:0;font-size:1.05rem}
 
-    /* Card-like table wrapper */
-    .table-card{
-      background:var(--card-bg);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      margin-bottom:1.25rem;
-      border: 1px solid rgba(15,23,36,0.04);
-    }
-    .table-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:0.9rem 1rem;
-      border-bottom:1px solid rgba(15,23,36,0.04);
-      background:linear-gradient(180deg, rgba(13,110,253,0.02), transparent);
-    }
-    .table-header h2{margin:0;font-size:1.05rem;letter-spacing:0.2px}
+    /* unified table style */
+    table.sortable-table{width:100%;border-collapse:collapse;font-size:.95rem;color:#0f1724}
+    table.sortable-table thead th{padding:.9rem 1rem;text-align:left;font-weight:700;background:linear-gradient(180deg,rgba(13,110,253,0.02),transparent);border-bottom:1px solid rgba(15,23,36,0.04)}
+    table.sortable-table tbody td{padding:.75rem 1rem;border-bottom:1px dashed rgba(15,23,36,0.03);vertical-align:middle}
+    table.sortable-table tbody tr:hover td{background:linear-gradient(90deg,rgba(13,110,253,0.02),transparent)}
+    .badge{display:inline-block;padding:.22rem .5rem;border-radius:999px;background:#eef2ff;color:#0b254a;font-weight:600;margin-right:.35rem}
 
-    /* Table visual style */
-    table.table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:0.95rem;
-      color: #0f1724;
-    }
-    table.table thead th{
-      text-align:left;
-      padding:0.9rem 1rem;
-      font-weight:700;
-      font-size:.92rem;
-      background:linear-gradient(180deg,rgba(13,110,253,0.02),transparent);
-      color: #0b1220;
-      border-bottom:1px solid rgba(15,23,36,0.04);
-      position:relative;
-    }
-    table.table tbody td{
-      padding:0.75rem 1rem;
-      vertical-align:middle;
-      border-bottom:1px dashed rgba(15,23,36,0.03);
-    }
-    table.table tbody tr:hover td{
-      background: linear-gradient(90deg, rgba(13,110,253,0.02), transparent);
-      transform: translateZ(0);
-    }
-    table.table tbody tr:nth-child(even) td{
-      background: linear-gradient(180deg, rgba(250,250,252,1), rgba(255,255,255,0));
-    }
+    /* header sort button */
+    .sort-btn{background:none;border:0;cursor:pointer;font-weight:700;padding:0;display:inline-flex;align-items:center;gap:.35rem}
+    .sort-indicator{display:inline-block;width:.8rem}
+    .sort-indicator.asc::after{content:"▲";color:var(--accent);font-size:.7rem}
+    .sort-indicator.desc::after{content:"▼";color:var(--accent);font-size:.7rem}
+    thead th.sortable{cursor:pointer;user-select:none}
+    thead th.sortable:focus{outline:3px solid rgba(13,110,253,.12);border-radius:6px}
 
-    /* badges and buttons */
-    .badge{
-      display:inline-block;
-      padding:.22rem .5rem;
-      border-radius:999px;
-      background:var(--badge-bg);
-      color:#0b254a;
-      font-weight:600;
-      font-size:.78rem;
-      margin-right:.35rem;
-      transition:transform .12s, box-shadow .12s;
-    }
-    .badge:hover{transform:translateY(-2px); box-shadow:0 6px 16px rgba(13,110,253,0.06)}
+    /* row action menu */
+    .row-actions{display:flex;gap:.5rem;align-items:center}
+    .action-btn{background:transparent;border:0;color:var(--accent);cursor:pointer;font-weight:700;padding:.25rem .45rem;border-radius:8px}
+    .context-menu{position:absolute;background:#fff;border:1px solid rgba(15,23,36,0.06);box-shadow:0 10px 30px rgba(2,6,23,0.08);border-radius:8px;z-index:60;padding:.35rem;display:none;min-width:160px}
+    .context-menu a{display:block;padding:.45rem .6rem;color:#0b1220;text-decoration:none}
+    .context-menu a:hover{background:#f6f8fb}
 
-    .btn{
-      display:inline-block;
-      background:var(--accent);
-      color:#fff;
-      padding:.45rem .7rem;
-      border-radius:8px;
-      text-decoration:none;
-      font-weight:700;
-      box-shadow: 0 6px 18px rgba(13,110,253,0.08);
-      transition:transform .12s ease, box-shadow .12s ease, opacity .12s;
-      border:none;
-    }
-    .btn:hover{transform:translateY(-3px); opacity:.98}
-
-    /* subtle small helpers */
-    .muted{color:var(--muted);font-size:.92rem}
-    .small{font-size:.86rem;color:var(--muted)}
-    .text-truncate{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:480px;display:block}
-
-    /* responsive adjustments */
     @media (max-width:900px){
-      table.table thead th:nth-child(4), table.table td:nth-child(4){display:none}
-      .table-header{flex-direction:column;gap:.6rem;align-items:flex-start}
+      table.sortable-table thead th:nth-child(4),table.sortable-table td:nth-child(4){display:none}
     }
   </style>
+
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -184,9 +71,85 @@
         </div>
       {% endif %}
     {% endwith %}
-
     {% block content %}{% endblock %}
   </main>
+
+  <!-- include shared sorter and context menu JS (external or inline fallback) -->
+  <script src="{{ url_for('static', filename='js/table-sorter.js') }}" defer></script>
+  <script>
+  // inline fallback if static file not present
+  (function(){
+    if(window.TableSorterLoaded) return;
+    window.TableSorterLoaded = true;
+
+    function normalizeCell(cell){
+      if(!cell) return '';
+      if(cell.dataset && cell.dataset.sort) return cell.dataset.sort;
+      const badges = cell.querySelectorAll && cell.querySelectorAll('.badge');
+      if(badges && badges.length) return Array.from(badges).map(b=>b.textContent.trim()).join(', ');
+      const strong = cell.querySelector && cell.querySelector('strong');
+      if(strong) return strong.textContent.trim() + ' ' + cell.textContent.replace(strong.textContent,'').trim();
+      return cell.textContent.trim();
+    }
+
+    function attachToTables(){
+      document.querySelectorAll('table.sortable-table').forEach(table=>{
+        const tbody = table.tBodies[0];
+        if(!tbody) return;
+        table.querySelectorAll('.sort-btn').forEach(btn=>{
+          const col = parseInt(btn.dataset.col,10);
+          const type = btn.dataset.type || 'text';
+          btn.addEventListener('click', (ev)=>{
+            ev.stopPropagation();
+            const current = table.dataset.sortCol === String(col) ? table.dataset.sortDir : null;
+            const asc = current !== 'asc';
+            // sort
+            const rows = Array.from(tbody.rows);
+            rows.sort((a,b)=>{
+              let A = normalizeCell(a.cells[col]), B = normalizeCell(b.cells[col]);
+              if(type==='num'){A = parseFloat(A)||0; B = parseFloat(B)||0; return asc?A-B:B-A}
+              if(type==='date'){A = Date.parse(A)||Date.parse(a.cells[col].dataset.sort||'')||0; B = Date.parse(B)||Date.parse(b.cells[col].dataset.sort||'')||0; return asc?A-B:B-A}
+              A=(A||'').toLowerCase(); B=(B||'').toLowerCase();
+              if(A<B) return asc?-1:1; if(A>B) return asc?1:-1; return 0;
+            });
+            rows.forEach(r=>tbody.appendChild(r));
+            table.dataset.sortCol = String(col); table.dataset.sortDir = asc ? 'asc' : 'desc';
+            // update visuals
+            table.querySelectorAll('.sort-indicator').forEach(ind=>ind.classList.remove('asc','desc'));
+            const ind = btn.querySelector('.sort-indicator'); if(ind) ind.classList.add(asc ? 'asc' : 'desc');
+            // set aria-sort on th
+            table.querySelectorAll('thead th').forEach(th => th.removeAttribute('aria-sort'));
+            const th = btn.closest('th'); if(th) th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
+          });
+
+          // make whole th clickable and keyboard-accessible
+          const th = btn.closest('th');
+          if(th){ th.classList.add('sortable'); th.tabIndex = 0;
+            th.addEventListener('click', (ev) => { if(!ev.target.closest('button')) btn.click(); });
+            th.addEventListener('keydown', (ev) => { if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); btn.click(); }});
+          }
+        });
+
+        // attach simple context menu toggles for row actions
+        table.querySelectorAll('button.row-action-toggle').forEach(toggle=>{
+          toggle.addEventListener('click', (ev)=>{
+            ev.stopPropagation();
+            // close others
+            document.querySelectorAll('.context-menu').forEach(m=>m.style.display='none');
+            const menu = toggle.parentElement.querySelector('.context-menu');
+            if(menu){ menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; const rect = toggle.getBoundingClientRect(); menu.style.left = (rect.right - 160) + 'px'; menu.style.top = (rect.bottom + 6) + 'px'; }
+          });
+        });
+
+        // global click hides context menus
+        document.addEventListener('click', ()=>document.querySelectorAll('.context-menu').forEach(m=>m.style.display='none'));
+      });
+    }
+
+    // attach once DOM ready
+    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', attachToTables); } else { attachToTables(); }
+  })();
+  </script>
 
   {% block scripts %}{% endblock %}
 </body>

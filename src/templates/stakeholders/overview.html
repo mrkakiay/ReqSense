@@ -3,48 +3,50 @@
 {% block title %}Stakeholders — ReqSense{% endblock %}
 
 {% block content %}
-<h2>Stakeholder Management</h2>
-<p class="text-muted">Manage stakeholder metadata — type, importance, influence and Mendelow quadrant.</p>
+<div class="table-card">
+  <div class="table-header">
+    <h2>Stakeholders</h2>
+    <div><a class="btn" href="{{ url_for('stakeholders.create') }}">Add stakeholder</a></div>
+  </div>
 
-<table class="table" style="width:100%;border-collapse:collapse">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-      <th>Role</th>
-      <th>Department</th>
-      <th>Email</th>
-      <th>Importance</th>
-      <th>Influence</th>
-      <th>Quadrant</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for s in stakeholders %}
-    {% set imp = getattr(s, 'importance', None) %}
-    {% set inf = getattr(s, 'influence', None) %}
-    {% if imp is not none and inf is not none %}
-      {% set quadrant = (
-         'Key Player' if imp|float >=5 and inf|float >=5 else
-         'Keep Satisfied' if imp|float >=5 and inf|float <5 else
-         'Keep Informed' if imp|float <5 and inf|float >=5 else
-         'Monitor' ) %}
-    {% else %}
-      {% set quadrant = 'n/a' %}
-    {% endif %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td>{{ s.name }}</td>
-      <td>{{ s.role or '—' }}</td>
-      <td>{{ s.department or '—' }}</td>
-      <td>{{ s.email or '—' }}</td>
-      <td>{{ imp if imp is not none else 'n/a' }}</td>
-      <td>{{ inf if inf is not none else 'n/a' }}</td>
-      <td>{{ quadrant }}</td>
-    </tr>
-    {% else %}
-    <tr><td colspan="8">No stakeholders yet.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <div style="padding:1rem">
+    <table class="sortable-table">
+      <thead>
+        <tr>
+          <th><button class="sort-btn" data-col="0" data-type="num"># <span class="sort-indicator"></span></button></th>
+          <th><button class="sort-btn" data-col="1" data-type="text">Name <span class="sort-indicator"></span></button></th>
+          <th><button class="sort-btn" data-col="2" data-type="text">Role <span class="sort-indicator"></span></button></th>
+          <th><button class="sort-btn" data-col="3" data-type="text">Department <span class="sort-indicator"></span></button></th>
+          <th><button class="sort-btn" data-col="4" data-type="num">Importance <span class="sort-indicator"></span></button></th>
+          <th><button class="sort-btn" data-col="5" data-type="num">Influence <span class="sort-indicator"></span></button></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in stakeholders %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.role or '—' }}</td>
+          <td>{{ s.department or '—' }}</td>
+          <td>{{ s.importance if s.importance is not none else 'n/a' }}</td>
+          <td>{{ s.influence if s.influence is not none else 'n/a' }}</td>
+          <td style="position:relative">
+            <div class="row-actions">
+              <a class="action-btn" href="{{ url_for('stakeholders.edit', stakeholder_id=s.id) }}">Edit</a>
+              <button class="action-btn row-action-toggle" aria-haspopup="true">•••</button>
+            </div>
+            <div class="context-menu" role="menu">
+              <a href="{{ url_for('stakeholders.view', stakeholder_id=s.id) }}">View</a>
+              <a href="{{ url_for('stakeholders.delete', stakeholder_id=s.id) }}">Delete</a>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No stakeholders yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
