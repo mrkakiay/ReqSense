@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Stakeholders — ReqSense{% endblock %}
+
+{% block content %}
+<h2>Stakeholder Management</h2>
+<p class="text-muted">Manage stakeholder metadata — type, importance, influence and Mendelow quadrant.</p>
+
+<table class="table" style="width:100%;border-collapse:collapse">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Department</th>
+      <th>Email</th>
+      <th>Importance</th>
+      <th>Influence</th>
+      <th>Quadrant</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in stakeholders %}
+    {% set imp = getattr(s, 'importance', None) %}
+    {% set inf = getattr(s, 'influence', None) %}
+    {% if imp is not none and inf is not none %}
+      {% set quadrant = (
+         'Key Player' if imp|float >=5 and inf|float >=5 else
+         'Keep Satisfied' if imp|float >=5 and inf|float <5 else
+         'Keep Informed' if imp|float <5 and inf|float >=5 else
+         'Monitor' ) %}
+    {% else %}
+      {% set quadrant = 'n/a' %}
+    {% endif %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ s.name }}</td>
+      <td>{{ s.role or '—' }}</td>
+      <td>{{ s.department or '—' }}</td>
+      <td>{{ s.email or '—' }}</td>
+      <td>{{ imp if imp is not none else 'n/a' }}</td>
+      <td>{{ inf if inf is not none else 'n/a' }}</td>
+      <td>{{ quadrant }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">No stakeholders yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

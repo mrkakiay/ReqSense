@@ -1,40 +1,154 @@
 {% extends "base.html" %}
 
+{% block title %}Edit Experience — ReqSense{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h2 class="mb-4">Edit Experience</h2>
-    
-    <form method="POST">
-        <div class="mb-3">
-            <label for="narrative_text" class="form-label">Experience Description</label>
-            <textarea class="form-control" id="narrative_text" name="narrative_text" 
-                      rows="5" required>{{ experience.narrative_text }}</textarea>
+<div class="table-card" style="max-width:980px;margin:1.5rem auto;">
+  <div class="table-header">
+    <h2>Edit Experience</h2>
+    <div>
+      <a class="btn" href="{{ url_for('experiences.overview') }}">Back to list</a>
+    </div>
+  </div>
+
+  <form method="post" style="padding:1.25rem;display:grid;gap:1rem">
+    <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1 1 60%">
+        <label style="display:block;font-weight:700;margin-bottom:.4rem">Narrative</label>
+        <textarea id="narrative" name="narrative_text" rows="6" placeholder="Describe the stakeholder experience..." required
+                  style="width:100%;padding:.75rem;border-radius:10px;border:1px solid rgba(15,23,36,0.06);resize:vertical;font-size:.96rem">{{ experience.narrative_text }}</textarea>
+        <div style="display:flex;justify-content:space-between;margin-top:.35rem">
+          <small class="muted">Explain the context, pain and desired outcome</small>
+          <small id="char-count" class="small muted">0 / 5000</small>
         </div>
-        
-        <div class="mb-3">
-            <label for="current_workaround" class="form-label">Current Workaround (if any)</label>
-            <textarea class="form-control" id="current_workaround" name="current_workaround" 
-                      rows="3">{{ experience.current_workaround }}</textarea>
+      </div>
+
+      <aside style="width:320px;flex:0 0 320px">
+        <label style="font-weight:700;margin-bottom:.4rem;display:block">Stakeholder</label>
+        {% if experience.stakeholder %}
+          <div style="padding:.6rem;border-radius:8px;border:1px solid rgba(15,23,36,0.04);background:#fbfdff">
+            <strong>{{ experience.stakeholder.name }}</strong><br>
+            <small class="muted">{{ experience.stakeholder.role or '—' }}</small><br>
+            <small class="muted">{{ experience.stakeholder.email or '—' }}</small>
+          </div>
+        {% else %}
+          <div style="padding:.6rem;border-radius:8px;border:1px dashed rgba(15,23,36,0.04);background:#fff">No stakeholder linked</div>
+        {% endif %}
+
+        <div style="margin-top:.9rem">
+          <label style="font-weight:700;display:block">Impact severity</label>
+          <select name="impact_severity" style="width:100%;padding:.5rem;border-radius:8px;border:1px solid rgba(15,23,36,0.06)">
+            <option value="">Select</option>
+            {% for level in ['Low','Medium','High','Critical'] %}
+              <option value="{{ level }}" {% if experience.impact_severity==level %}selected{% endif %}>{{ level }}</option>
+            {% endfor %}
+          </select>
         </div>
-        
-        <div class="mb-3">
-            <label for="impact_severity" class="form-label">Impact Severity</label>
-            <select class="form-control" id="impact_severity" name="impact_severity" required>
-                <option value="Low" {% if experience.impact_severity == 'Low' %}selected{% endif %}>Low</option>
-                <option value="Medium" {% if experience.impact_severity == 'Medium' %}selected{% endif %}>Medium</option>
-                <option value="High" {% if experience.impact_severity == 'High' %}selected{% endif %}>High</option>
-            </select>
+
+        <div style="margin-top:.75rem">
+          <label style="font-weight:700;display:block">Context tags</label>
+          <div id="tag-input" style="display:flex;flex-wrap:wrap;gap:.35rem;padding:.45rem;border-radius:8px;border:1px solid rgba(15,23,36,0.04);background:#fff">
+            <!-- existing tags -->
+            {% for t in (experience.context_tags or []) %}
+              <span class="badge tag-badge">{{ t }}<button type="button" class="tag-remove" data-tag="{{ t }}" style="margin-left:.45rem;background:none;border:0;cursor:pointer">✕</button></span>
+            {% endfor %}
+            <input id="tag-box" type="text" placeholder="Add tag and press Enter" style="flex:1;border:0;outline:none;padding:.25rem;min-width:120px" />
+          </div>
+          <input type="hidden" id="context_tags" name="context_tags" value="{{ (experience.context_tags or []) | join(',') }}">
         </div>
-        
-        <div class="mb-3">
-            <label for="context_tags" class="form-label">Context Tags</label>
-            <input type="text" class="form-control" id="context_tags" name="context_tags" 
-                   value="{{ experience.context_tags|join(',') }}"
-                   placeholder="performance, usability, backend (comma-separated)">
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{{ url_for('experiences.overview') }}" class="btn btn-secondary ms-2">Cancel</a>
-    </form>
+      </aside>
+    </div>
+
+    <div>
+      <label style="font-weight:700;display:block;margin-bottom:.4rem">Current workaround</label>
+      <textarea name="current_workaround" rows="3" placeholder="How are users currently working around the problem?" style="width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(15,23,36,0.04)">{{ experience.current_workaround }}</textarea>
+    </div>
+
+    <div style="display:flex;gap:.8rem;justify-content:flex-end;margin-top:.25rem">
+      <a href="{{ url_for('experiences.overview') }}" class="btn" style="background:#f3f4f6;color:#0b1220;box-shadow:none;border:1px solid rgba(15,23,36,0.04)">Cancel</a>
+      <button type="submit" class="btn">Save changes</button>
+    </div>
+  </form>
 </div>
+
+<script>
+// character counter for narrative
+(function(){
+  const ta = document.getElementById('narrative');
+  const count = document.getElementById('char-count');
+  function update(){ count.textContent = (ta.value.length) + ' / 5000'; }
+  ta.addEventListener('input', update);
+  update();
+})();
+
+// simple tags input
+(function(){
+  const tagBox = document.getElementById('tag-box');
+  const container = document.getElementById('tag-input');
+  const hidden = document.getElementById('context_tags');
+
+  function refreshHidden(){
+    const tags = Array.from(container.querySelectorAll('.tag-badge')).map(el => el.childNodes[0].textContent.trim());
+    hidden.value = tags.join(',');
+  }
+
+  function addTag(text){
+    text = text.trim();
+    if(!text) return;
+    // dedupe
+    const existing = Array.from(container.querySelectorAll('.tag-badge')).some(el => el.childNodes[0].textContent.trim().toLowerCase() === text.toLowerCase());
+    if(existing) return;
+    const span = document.createElement('span');
+    span.className = 'badge tag-badge';
+    span.style.display='inline-flex';
+    span.style.alignItems='center';
+    span.style.gap='0.5rem';
+    span.innerHTML = document.createTextNode(text).textContent + '<button type="button" class="tag-remove" style="margin-left:.45rem;background:none;border:0;cursor:pointer">✕</button>';
+    // create properly so text node is first child
+    span.innerHTML = '';
+    const textNode = document.createTextNode(text);
+    span.appendChild(textNode);
+    const btn = document.createElement('button');
+    btn.type='button';
+    btn.className='tag-remove';
+    btn.textContent='✕';
+    btn.style.marginLeft='.45rem';
+    btn.style.background='none';
+    btn.style.border='0';
+    btn.style.cursor='pointer';
+    span.appendChild(btn);
+    container.insertBefore(span, tagBox);
+    btn.addEventListener('click', () => { span.remove(); refreshHidden(); });
+    refreshHidden();
+  }
+
+  // remove handler for existing remove buttons
+  container.querySelectorAll('.tag-remove').forEach(b => {
+    b.addEventListener('click', (ev) => {
+      const t = ev.currentTarget.closest('.tag-badge');
+      if(t){ t.remove(); refreshHidden(); }
+    });
+  });
+
+  tagBox.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      addTag(tagBox.value);
+      tagBox.value = '';
+    } else if(e.key === 'Backspace' && tagBox.value === ''){
+      const badges = container.querySelectorAll('.tag-badge');
+      if(badges.length) { badges[badges.length-1].remove(); refreshHidden(); }
+    }
+  });
+
+  // initialize hidden from server side
+  (function init(){
+    const initial = hidden.value;
+    if(initial){
+      initial.split(',').map(s=>s.trim()).filter(Boolean).forEach(addTag);
+      tagBox.value = '';
+    }
+  })();
+})();
+</script>
 {% endblock %}

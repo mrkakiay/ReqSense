@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Experiences — ReqSense{% endblock %}
+
+{% block content %}
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+  <h2>Experiences</h2>
+  <div>
+    <a class="btn" href="{{ url_for('experiences.submit_experience') }}">Submit Experience</a>
+    <a class="btn" href="{{ url_for('experiences.traceability') }}" style="margin-left:.5rem">Traceability & Requirements</a>
+  </div>
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Summary</th>
+      <th>Stakeholder</th>
+      <th>Tags</th>
+      <th>Impact</th>
+      <th>Created</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in experiences %}
+    <tr>
+      <td>{{ e.id }}</td>
+      <td style="max-width:420px">
+        <div><strong>{{ e.experience_id or ('#'~e.id) }}</strong></div>
+        <div class="text-muted">{{ (e.narrative_text[:160] ~ ('...' if e.narrative_text|length > 160 else '')) }}</div>
+      </td>
+      <td>
+        {% if e.stakeholder %}
+          <div>{{ e.stakeholder.name }}</div>
+          <small class="text-muted">{{ e.stakeholder.role or '' }}</small>
+        {% else %}
+          <small class="text-muted">—</small>
+        {% endif %}
+      </td>
+      <td>
+        {% for t in (e.context_tags or []) %}
+          <span class="badge">{{ t }}</span>
+        {% else %}
+          <small class="text-muted">—</small>
+        {% endfor %}
+      </td>
+      <td>{{ e.impact_severity or '—' }}</td>
+      <td>{{ e.created_at.strftime('%Y-%m-%d') if e.created_at else '—' }}</td>
+      <td>
+        <a href="{{ url_for('experiences.edit_experience', experience_id=e.id) }}">Edit</a>
+        <span style="margin:0 .5rem">•</span>
+        <a href="{{ url_for('experiences.traceability') }}#exp-{{ e.id }}">Trace</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No experiences yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

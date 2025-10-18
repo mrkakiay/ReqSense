@@ -1,6 +1,6 @@
 import os
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Table, ForeignKey, JSON
 from sqlalchemy.orm import relationship
@@ -266,3 +266,22 @@ class JobExperience(db.Model):
 
     def __repr__(self):
         return f'<JobExperience {self.title} at {self.company}>'
+
+class RequirementSuggestion(db.Model):
+    __tablename__ = 'requirement_suggestions'
+    id = db.Column(db.Integer, primary_key=True)
+    experience_id = db.Column(db.Integer, db.ForeignKey('experiences.id'), nullable=False)
+    requirement_text = db.Column(db.Text, nullable=True)
+    why_statement = db.Column(db.Text, nullable=True)
+    priority = db.Column(db.String(50), nullable=True)
+    tags = db.Column(db.JSON, nullable=True)
+    confidence = db.Column(db.Float, nullable=True)
+    raw_response = db.Column(db.Text, nullable=True)
+    model_version = db.Column(db.String(128), nullable=True)
+    params = db.Column(db.JSON, nullable=True)
+    status = db.Column(db.String(32), default='pending')
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    processed_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    reviewer = db.Column(db.String(255), nullable=True)
+
+    experience = db.relationship('Experience', backref='suggestions')
