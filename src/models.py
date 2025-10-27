@@ -1,11 +1,11 @@
 import os
 import json
-from datetime import datetime, timezone
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Table, ForeignKey, JSON
-from sqlalchemy.orm import relationship
 import hashlib
 import time
+from datetime import datetime, timezone, timedelta
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Table, JSON, ForeignKey
+from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
 
@@ -95,21 +95,51 @@ stakeholder_requirements = Table(
 
 class Stakeholder(db.Model):
     __tablename__ = 'stakeholders'
-    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(100))
-    department = db.Column(db.String(100))
-    email = db.Column(db.String(255))
-    requirements = relationship('RequirementSubmission', 
-                              secondary='stakeholder_requirements',
-                              back_populates='stakeholders')
-    experiences = relationship('Experience', back_populates='stakeholder')
+    role = db.Column(db.String(255), nullable=True)
+    department = db.Column(db.String(255), nullable=True)
+    email = db.Column(db.String(255), nullable=True)
+    type = db.Column(db.String(100), nullable=True)       # e.g. Customer, Partner, Internal
+    importance = db.Column(db.Integer, nullable=True)    # 0..10
+    influence = db.Column(db.Integer, nullable=True)     # 0..10
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return self
+    # use back_populates to match Experience.stakeholder (avoids duplicate backref/back_populates definitions)
+    experiences = db.relationship('Experience', back_populates='stakeholder', lazy='select')
+
+    # relationship to RequirementSubmission (matches RequirementSubmission.stakeholders back_populates)
+    requirements = db.relationship(
+        'RequirementSubmission',
+        secondary=stakeholder_requirements,
+        back_populates='stakeholders',
+        lazy='select'
+    )
+
+    @property
+    def mendelow_quadrant(self):
+        """
+        Simple Mendelow quadrant classification:
+        - Key Player: importance >=5 and influence >=5
+        - Keep Satisfied: importance >=5 and influence <5
+        - Keep Informed: importance <5 and influence >=5
+        - Monitor: otherwise
+        """
+        if self.importance is None or self.influence is None:
+            return 'n/a'
+        try:
+            imp = int(self.importance)
+            inf = int(self.influence)
+        except Exception:
+            return 'n/a'
+        if imp >= 5 and inf >= 5:
+            return 'Key Player'
+        if imp >= 5 and inf < 5:
+            return 'Keep Satisfied'
+        if imp < 5 and inf >= 5:
+            return 'Keep Informed'
+        return 'Monitor'
 
 class RequirementSubmission(db.Model):
     __tablename__ = 'requirement_submissions'

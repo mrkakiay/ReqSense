@@ -5,48 +5,59 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{% block title %}ReqSense{% endblock %}</title>
 
-  <!-- Shared visual styles for cards/tables/buttons -->
   <style>
-    :root{--accent:#0d6efd;--muted:#6c757d;--card:#fff;--radius:12px}
-    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;margin:0;background:linear-gradient(#f6f8fb,#fff)}
-    .topnav{display:flex;justify-content:space-between;align-items:center;padding:.7rem 1rem;background:linear-gradient(90deg,var(--accent),#1467ff);color:#fff;box-shadow:0 8px 30px rgba(13,110,253,.08);position:sticky;top:0;z-index:40}
-    .brand{font-weight:800}
+    :root{
+      --accent:#0d6efd;
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --muted:#6c757d;
+      --radius:10px;
+      --shadow: 0 8px 26px rgba(13,110,253,0.06);
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#081126;background:linear-gradient(180deg,var(--bg),#ffffff)}
+    .topnav{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1rem;background:linear-gradient(90deg,var(--accent),#1467ff);color:#fff;box-shadow:0 6px 20px rgba(13,110,253,0.10);position:sticky;top:0;z-index:40}
+    .brand{font-weight:800;letter-spacing:.3px}
     .nav-links{display:flex;gap:.5rem}
-    .nav-links a{color:#fff;text-decoration:none;padding:.45rem .7rem;border-radius:8px;font-weight:600}
-    .nav-links a.active{background:rgba(255,255,255,.08)}
+    .nav-links a{color:#fff;text-decoration:none;padding:.45rem .65rem;border-radius:8px;font-weight:700;transition:transform .12s,background .12s}
+    .nav-links a:hover{transform:translateY(-2px)}
+    .nav-links a.active{background:rgba(255,255,255,0.06)}
 
     .container{max-width:1120px;margin:1.25rem auto;padding:0 1rem}
-    .table-card{background:var(--card);border-radius:var(--radius);box-shadow:0 8px 26px rgba(13,110,253,.06);overflow:hidden;margin-bottom:1.25rem;border:1px solid rgba(15,23,36,0.04)}
-    .table-header{display:flex;justify-content:space-between;align-items:center;padding:.9rem 1rem;border-bottom:1px solid rgba(15,23,36,0.04)}
+    .table-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem;border:1px solid rgba(2,6,23,0.04)}
+    .table-header{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1rem;border-bottom:1px solid rgba(2,6,23,0.04)}
     .table-header h2{margin:0;font-size:1.05rem}
 
-    /* unified table style */
-    table.sortable-table{width:100%;border-collapse:collapse;font-size:.95rem;color:#0f1724}
-    table.sortable-table thead th{padding:.9rem 1rem;text-align:left;font-weight:700;background:linear-gradient(180deg,rgba(13,110,253,0.02),transparent);border-bottom:1px solid rgba(15,23,36,0.04)}
-    table.sortable-table tbody td{padding:.75rem 1rem;border-bottom:1px dashed rgba(15,23,36,0.03);vertical-align:middle}
-    table.sortable-table tbody tr:hover td{background:linear-gradient(90deg,rgba(13,110,253,0.02),transparent)}
-    .badge{display:inline-block;padding:.22rem .5rem;border-radius:999px;background:#eef2ff;color:#0b254a;font-weight:600;margin-right:.35rem}
+    .btn{display:inline-block;background:var(--accent);color:#fff;padding:.45rem .7rem;border-radius:8px;text-decoration:none;font-weight:800;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(13,110,253,0.08)}
+    .btn.secondary{background:#fff;color:var(--accent);border:1px solid rgba(2,6,23,0.04)}
+    .muted{color:var(--muted)}
+    .small{font-size:.88rem;color:var(--muted)}
 
-    /* header sort button */
+    /* unified table */
+    table.sortable-table{width:100%;border-collapse:collapse;font-size:.95rem}
+    table.sortable-table thead th{padding:.9rem 1rem;text-align:left;font-weight:700;background:linear-gradient(180deg,rgba(13,110,253,0.02),transparent);border-bottom:1px solid rgba(2,6,23,0.04)}
+    table.sortable-table tbody td{padding:.75rem 1rem;border-bottom:1px dashed rgba(2,6,23,0.03);vertical-align:middle}
+    table.sortable-table tbody tr:hover td{background:linear-gradient(90deg,rgba(13,110,253,0.02),transparent)}
+
+    .badge{display:inline-block;padding:.22rem .5rem;border-radius:999px;background:#eef2ff;color:#06304b;font-weight:700;margin-right:.35rem}
+
     .sort-btn{background:none;border:0;cursor:pointer;font-weight:700;padding:0;display:inline-flex;align-items:center;gap:.35rem}
     .sort-indicator{display:inline-block;width:.8rem}
     .sort-indicator.asc::after{content:"▲";color:var(--accent);font-size:.7rem}
     .sort-indicator.desc::after{content:"▼";color:var(--accent);font-size:.7rem}
     thead th.sortable{cursor:pointer;user-select:none}
-    thead th.sortable:focus{outline:3px solid rgba(13,110,253,.12);border-radius:6px}
 
-    /* row action menu */
+    /* form card */
+    .form-grid{display:grid;grid-template-columns:1fr 320px;gap:1rem}
+    .form-field{display:flex;flex-direction:column;gap:.35rem}
+    input[type="text"], select, textarea{width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(2,6,23,0.06);font-size:.95rem}
+    textarea{min-height:120px;resize:vertical}
+
+    /* compact actions */
     .row-actions{display:flex;gap:.5rem;align-items:center}
     .action-btn{background:transparent;border:0;color:var(--accent);cursor:pointer;font-weight:700;padding:.25rem .45rem;border-radius:8px}
-    .context-menu{position:absolute;background:#fff;border:1px solid rgba(15,23,36,0.06);box-shadow:0 10px 30px rgba(2,6,23,0.08);border-radius:8px;z-index:60;padding:.35rem;display:none;min-width:160px}
-    .context-menu a{display:block;padding:.45rem .6rem;color:#0b1220;text-decoration:none}
-    .context-menu a:hover{background:#f6f8fb}
 
-    @media (max-width:900px){
-      table.sortable-table thead th:nth-child(4),table.sortable-table td:nth-child(4){display:none}
-    }
+    @media (max-width:900px){ .form-grid{grid-template-columns:1fr} }
   </style>
-
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -74,13 +85,11 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- include shared sorter and context menu JS (external or inline fallback) -->
-  <script src="{{ url_for('static', filename='js/table-sorter.js') }}" defer></script>
   <script>
-  // inline fallback if static file not present
+  // lightweight table sorter attached to tables using class="sortable-table"
   (function(){
-    if(window.TableSorterLoaded) return;
-    window.TableSorterLoaded = true;
+    if(window.ReqSenseTableSorterLoaded) return;
+    window.ReqSenseTableSorterLoaded = true;
 
     function normalizeCell(cell){
       if(!cell) return '';
@@ -92,7 +101,7 @@
       return cell.textContent.trim();
     }
 
-    function attachToTables(){
+    function attach(){
       document.querySelectorAll('table.sortable-table').forEach(table=>{
         const tbody = table.tBodies[0];
         if(!tbody) return;
@@ -103,7 +112,6 @@
             ev.stopPropagation();
             const current = table.dataset.sortCol === String(col) ? table.dataset.sortDir : null;
             const asc = current !== 'asc';
-            // sort
             const rows = Array.from(tbody.rows);
             rows.sort((a,b)=>{
               let A = normalizeCell(a.cells[col]), B = normalizeCell(b.cells[col]);
@@ -114,40 +122,22 @@
             });
             rows.forEach(r=>tbody.appendChild(r));
             table.dataset.sortCol = String(col); table.dataset.sortDir = asc ? 'asc' : 'desc';
-            // update visuals
             table.querySelectorAll('.sort-indicator').forEach(ind=>ind.classList.remove('asc','desc'));
             const ind = btn.querySelector('.sort-indicator'); if(ind) ind.classList.add(asc ? 'asc' : 'desc');
-            // set aria-sort on th
             table.querySelectorAll('thead th').forEach(th => th.removeAttribute('aria-sort'));
             const th = btn.closest('th'); if(th) th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
           });
 
-          // make whole th clickable and keyboard-accessible
           const th = btn.closest('th');
           if(th){ th.classList.add('sortable'); th.tabIndex = 0;
             th.addEventListener('click', (ev) => { if(!ev.target.closest('button')) btn.click(); });
             th.addEventListener('keydown', (ev) => { if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); btn.click(); }});
           }
         });
-
-        // attach simple context menu toggles for row actions
-        table.querySelectorAll('button.row-action-toggle').forEach(toggle=>{
-          toggle.addEventListener('click', (ev)=>{
-            ev.stopPropagation();
-            // close others
-            document.querySelectorAll('.context-menu').forEach(m=>m.style.display='none');
-            const menu = toggle.parentElement.querySelector('.context-menu');
-            if(menu){ menu.style.display = menu.style.display === 'block' ? 'none' : 'block'; const rect = toggle.getBoundingClientRect(); menu.style.left = (rect.right - 160) + 'px'; menu.style.top = (rect.bottom + 6) + 'px'; }
-          });
-        });
-
-        // global click hides context menus
-        document.addEventListener('click', ()=>document.querySelectorAll('.context-menu').forEach(m=>m.style.display='none'));
       });
     }
 
-    // attach once DOM ready
-    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', attachToTables); } else { attachToTables(); }
+    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', attach); } else { attach(); }
   })();
   </script>
 

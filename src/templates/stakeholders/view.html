@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Stakeholder — ReqSense{% endblock %}
+
+{% block content %}
+<div class="table-card" style="max-width:800px;margin:1.25rem auto;">
+  <div class="table-header">
+    <h2>Stakeholder: {{ stakeholder.name }}</h2>
+    <div>
+      <a class="btn secondary" href="{{ url_for('stakeholders.edit', stakeholder_id=stakeholder.id) }}">Edit</a>
+      <a class="btn secondary" href="{{ url_for('stakeholders.overview') }}">Back</a>
+    </div>
+  </div>
+
+  <div style="padding:1rem">
+    <dl style="display:grid;grid-template-columns:140px 1fr;gap:.6rem .8rem">
+      <dt class="small muted">Name</dt><dd><strong>{{ stakeholder.name }}</strong></dd>
+      <dt class="small muted">Role</dt><dd>{{ stakeholder.role or '—' }}</dd>
+      <dt class="small muted">Department</dt><dd>{{ stakeholder.department or '—' }}</dd>
+      <dt class="small muted">Email</dt><dd>{{ stakeholder.email or '—' }}</dd>
+      <dt class="small muted">Type</dt><dd>{{ stakeholder.type or '—' }}</dd>
+      <dt class="small muted">Importance</dt><dd>{{ stakeholder.importance if stakeholder.importance is not none else 'n/a' }}</dd>
+      <dt class="small muted">Influence</dt><dd>{{ stakeholder.influence if stakeholder.influence is not none else 'n/a' }}</dd>
+      <dt class="small muted">Mendelow</dt><dd>{{ stakeholder.mendelow_quadrant }}</dd>
+      <dt class="small muted">Notes</dt><dd><pre style="white-space:pre-wrap;margin:0">{{ stakeholder.notes or '—' }}</pre></dd>
+    </dl>
+  </div>
+</div>
+{% endblock %}

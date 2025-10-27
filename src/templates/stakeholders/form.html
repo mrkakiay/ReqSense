@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if stakeholder else 'Add' }} Stakeholder — ReqSense{% endblock %}
+
+{% block head_extra %}
+<style>
+.form-card{max-width:920px;margin:1.25rem auto;padding:0;border-radius:10px;box-shadow:0 8px 22px rgba(11,20,40,.06);background:#fff;overflow:hidden}
+.form-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid rgba(15,23,42,.04)}
+.form-body{padding:1.1rem 1.25rem;display:grid;gap:1rem}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-field{display:flex;flex-direction:column;gap:.35rem}
+label.form-label{font-weight:700;color:#0f172a}
+input[type="text"], input[type="email"], input[type="number"], textarea, select{
+  border:1px solid rgba(15,23,42,.08);padding:.55rem .65rem;border-radius:8px;background:#fff;outline:none;transition:box-shadow .12s,border-color .12s;
+}
+input:focus, textarea:focus, select:focus{box-shadow:0 6px 18px rgba(11,20,40,.06);border-color:#0b74de}
+small.helper{color:#6b7280}
+.actions{display:flex;justify-content:flex-end;gap:.6rem;padding:1rem;border-top:1px solid rgba(15,23,42,.04)}
+.btn.primary{background:#0b74de;color:#fff;border-radius:8px;padding:.5rem .75rem;border:0}
+.btn.secondary{background:transparent;border:1px solid rgba(15,23,42,.06);padding:.45rem .65rem;border-radius:8px}
+@media (max-width:780px){
+  .form-grid{grid-template-columns:1fr}
+  .actions{flex-direction:column-reverse;align-items:stretch}
+}
+.required{color:#ef4444;margin-left:.28rem}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-card" role="region" aria-labelledby="stake-form-title">
+  <div class="form-header">
+    <h2 id="stake-form-title">{{ 'Edit' if stakeholder else 'Add' }} Stakeholder</h2>
+    <div><a class="btn secondary" href="{{ url_for('stakeholders.overview') }}">Back</a></div>
+  </div>
+
+  <form method="post" class="form-body" novalidate>
+    <div class="form-field">
+      <label class="form-label" for="name">Name <span class="required" aria-hidden="true">*</span></label>
+      <input id="name" name="name" type="text" required value="{{ stakeholder.name if stakeholder else '' }}" placeholder="Full name (e.g. Jane Doe)">
+      <small class="helper">Use real name to make traceability easier.</small>
+    </div>
+
+    <div class="form-grid" aria-hidden="{{ 'false' }}">
+      <div class="form-field">
+        <label class="form-label" for="role">Role</label>
+        <input id="role" name="role" type="text" value="{{ stakeholder.role if stakeholder else '' }}" placeholder="e.g. Product Manager">
+        <small class="helper">Short role or title.</small>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="department">Department</label>
+        <input id="department" name="department" type="text" value="{{ stakeholder.department if stakeholder else '' }}" placeholder="e.g. Customer Success">
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-field">
+        <label class="form-label" for="email">Email</label>
+        <input id="email" name="email" type="email" value="{{ stakeholder.email if stakeholder else '' }}" placeholder="name@example.com" autocomplete="email">
+        <small class="helper">Optional — used for notifications and contact.</small>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="type">Type</label>
+        <select id="type" name="type" aria-label="Stakeholder type">
+          <option value="" {% if not stakeholder or not stakeholder.type %}selected{% endif %}>(none)</option>
+          {% for t in ['Customer','Partner','Internal','Regulator','Other'] %}
+            <option value="{{ t }}" {% if stakeholder and stakeholder.type==t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+        <small class="helper">Categorize for filtering & reporting.</small>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-field">
+        <label class="form-label" for="importance">Importance <span class="required" aria-hidden="true">*</span></label>
+        <input id="importance" name="importance" type="number" min="0" max="10" value="{{ stakeholder.importance if stakeholder and stakeholder.importance is not none else '' }}" placeholder="0-10" aria-describedby="importance-help" required>
+        <small id="importance-help" class="helper">0 = low, 10 = most important.</small>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="influence">Influence <span class="required" aria-hidden="true">*</span></label>
+        <input id="influence" name="influence" type="number" min="0" max="10" value="{{ stakeholder.influence if stakeholder and stakeholder.influence is not none else '' }}" placeholder="0-10" aria-describedby="influence-help" required>
+        <small id="influence-help" class="helper">0 = little influence, 10 = very influential.</small>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="notes">Notes</label>
+      <textarea id="notes" name="notes" rows="5" placeholder="Optional context, agreements, relationships...">{{ stakeholder.notes if stakeholder else '' }}</textarea>
+      <small class="helper">Capture context that helps derive requirements later.</small>
+    </div>
+
+    <div class="actions">
+      <a class="btn secondary" href="{{ url_for('stakeholders.overview') }}">Cancel</a>
+      <button type="submit" class="btn primary">{{ 'Save' if stakeholder else 'Create' }}</button>
+    </div>
+  </form>
+</div>
+
+<script>
+/* Small client-side polish: simple required validation & focus on first invalid */
+document.querySelector('form').addEventListener('submit', function(e){
+  const required = Array.from(this.querySelectorAll('[required]'));
+  const invalid = required.find(f => !f.value || f.value.trim()==='');
+  if(invalid){ e.preventDefault(); invalid.focus(); invalid.style.boxShadow='0 4px 14px rgba(239,68,68,.12)'; }
+});
+</script>
+{% endblock %}

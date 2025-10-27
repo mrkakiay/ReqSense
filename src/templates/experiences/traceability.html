@@ -1,52 +1,35 @@
 {% extends "base.html" %}
-{% block title %}Traceability & Requirements — ReqSense{% endblock %}
+{% block title %}Traceability — ReqSense{% endblock %}
 
 {% block content %}
 <div class="table-card">
   <div class="table-header">
-    <h2>Traceability & Requirements</h2>
-    <div><a class="btn" href="{{ url_for('experiences.overview') }}">Back</a></div>
+    <h2>Traceability</h2>
+    <div><a class="btn secondary" href="{{ url_for('experiences.overview') }}">Back</a></div>
   </div>
 
   <div style="padding:1rem">
-    <table class="sortable-table">
+    <p class="muted">Basic traceability overview. Populate this page with requirement-experience links and visualizations.</p>
+
+    <table class="sortable-table" style="margin-top:1rem">
       <thead>
         <tr>
-          <th><button class="sort-btn" data-col="0" data-type="num"># <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="1" data-type="text">Experience <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="2" data-type="text">Stakeholder <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="3" data-type="text">Requirements <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="4" data-type="text">Tags <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="5" data-type="date">Created <span class="sort-indicator"></span></button></th>
-          <th>Actions</th>
+          <th>#</th>
+          <th>Experience</th>
+          <th>Stakeholder</th>
+          <th>Submitted</th>
         </tr>
       </thead>
       <tbody>
         {% for e in experiences %}
-        <tr id="exp-{{ e.id }}">
-          <td>{{ e.id }}</td>
-          <td><strong>{{ e.experience_id or ('#' ~ e.id) }}</strong><div class="small muted text-truncate">{{ e.narrative_text[:160] }}</div></td>
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ e.narrative_text[:120] }}{% if e.narrative_text|length > 120 %}…{% endif %}</td>
           <td>{{ e.stakeholder.name if e.stakeholder else '—' }}</td>
-          <td>
-            {% if e.requirements %}
-              {% for r in e.requirements %}<div class="small">{{ r.requirement_id or ('R' ~ r.id) }} — {{ r.requirement_text[:90] }}</div>{% endfor %}
-            {% else %}<small class="muted">—</small>{% endif %}
-          </td>
-          <td>{% for t in (e.context_tags or []) %}<span class="badge">{{ t }}</span>{% else %}<small class="muted">—</small>{% endfor %}</td>
-          <td data-sort="{{ e.created_at.isoformat() if e.created_at }}">{{ e.created_at.strftime('%Y-%m-%d %H:%M') if e.created_at else '—' }}</td>
-          <td style="position:relative">
-            <div class="row-actions">
-              <a class="action-btn" href="{{ url_for('experiences.edit_experience', experience_id=e.id) }}">Edit</a>
-              <button class="action-btn row-action-toggle" aria-haspopup="true">•••</button>
-            </div>
-            <div class="context-menu" role="menu">
-              <a href="{{ url_for('experiences.generate_requirement', experience_id=e.id) }}">Generate requirement</a>
-              <a href="{{ url_for('experiences.traceability') }}#exp-{{ e.id }}">Show in matrix</a>
-            </div>
-          </td>
+          <td class="small muted">{{ e.created_at }}</td>
         </tr>
         {% else %}
-        <tr><td colspan="7">No experiences yet.</td></tr>
+        <tr><td colspan="4">No recent experiences.</td></tr>
         {% endfor %}
       </tbody>
     </table>

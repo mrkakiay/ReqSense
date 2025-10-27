@@ -1,52 +1,137 @@
 {% extends "base.html" %}
-
 {% block title %}Stakeholders — ReqSense{% endblock %}
 
+{% block head_extra %}
+<style>
+/* Scoped styles for stakeholder pages */
+.stake-card{max-width:1100px;margin:1.25rem auto;padding:0;border-radius:10px;box-shadow:0 6px 18px rgba(11,20,40,.06);overflow:hidden;background:#fff}
+.stake-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid rgba(15,23,42,.04)}
+.stake-header h2{margin:0;font-size:1.15rem}
+.stake-actions{display:flex;gap:.6rem;align-items:center}
+.search-input{border:1px solid rgba(15,23,42,.08);padding:.5rem .75rem;border-radius:8px;min-width:220px}
+.table-wrap{padding:1rem;overflow:auto}
+.stake-table{width:100%;border-collapse:collapse;font-size:.95rem}
+.stake-table thead th{color:#344054;text-align:left;padding:.65rem .6rem;font-weight:700;border-bottom:1px solid rgba(15,23,42,.06)}
+.stake-table tbody td{padding:.6rem .6rem;border-bottom:1px solid rgba(15,23,42,.03);vertical-align:middle}
+.badge{display:inline-block;padding:.22rem .5rem;border-radius:999px;font-weight:600;font-size:.8rem}
+.badge-key{background:#0b74de;color:#fff}
+.badge-sat{background:#f59e0b;color:#fff}
+.badge-inf{background:#06b6d4;color:#073642}
+.badge-mon{background:#e5e7eb;color:#111827}
+.action-btn{background:transparent;border:0;color:#0b74de;padding:.25rem .45rem;cursor:pointer;text-decoration:underline}
+.row-actions{display:flex;gap:.5rem;align-items:center}
+.small-muted{color:#6b7280;font-size:.85rem}
+@media (max-width:780px){
+  .stake-table thead{display:none}
+  .stake-table tbody td{display:block;padding:.6rem 0;border-bottom:1px solid rgba(15,23,42,.06)}
+  .stake-table tbody tr{margin-bottom:.5rem;display:block;border-bottom:1px solid rgba(15,23,42,.04)}
+  .row-actions{margin-top:.5rem}
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="table-card">
-  <div class="table-header">
-    <h2>Stakeholders</h2>
-    <div><a class="btn" href="{{ url_for('stakeholders.create') }}">Add stakeholder</a></div>
+<div class="stake-card">
+  <div class="stake-header">
+    <div style="display:flex;gap:1rem;align-items:center">
+      <h2>Stakeholders</h2>
+      <small class="small-muted">Manage the people and groups relevant to requirements.</small>
+    </div>
+
+    <div class="stake-actions">
+      <input class="search-input" id="stake-search" placeholder="Search name, role, department..." aria-label="Search stakeholders">
+      <a class="btn" href="{{ url_for('stakeholders.create') }}">Add stakeholder</a>
+    </div>
   </div>
 
-  <div style="padding:1rem">
-    <table class="sortable-table">
+  <div class="table-wrap">
+    <table class="stake-table" role="table" aria-label="Stakeholders list">
       <thead>
         <tr>
-          <th><button class="sort-btn" data-col="0" data-type="num"># <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="1" data-type="text">Name <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="2" data-type="text">Role <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="3" data-type="text">Department <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="4" data-type="num">Importance <span class="sort-indicator"></span></button></th>
-          <th><button class="sort-btn" data-col="5" data-type="num">Influence <span class="sort-indicator"></span></button></th>
-          <th>Actions</th>
+          <th style="width:42px">#</th>
+          <th>Name</th>
+          <th>Role / Department</th>
+          <th style="width:120px">Importance</th>
+          <th style="width:120px">Influence</th>
+          <th style="width:120px">Mendelow</th>
+          <th style="width:160px">Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="stake-tbody">
         {% for s in stakeholders %}
-        <tr>
+        <tr data-name="{{ s.name|lower }}" data-role="{{ (s.role or '')|lower }}" data-dept="{{ (s.department or '')|lower }}">
           <td>{{ loop.index }}</td>
-          <td>{{ s.name }}</td>
-          <td>{{ s.role or '—' }}</td>
-          <td>{{ s.department or '—' }}</td>
-          <td>{{ s.importance if s.importance is not none else 'n/a' }}</td>
-          <td>{{ s.influence if s.influence is not none else 'n/a' }}</td>
-          <td style="position:relative">
-            <div class="row-actions">
-              <a class="action-btn" href="{{ url_for('stakeholders.edit', stakeholder_id=s.id) }}">Edit</a>
-              <button class="action-btn row-action-toggle" aria-haspopup="true">•••</button>
+          <td>
+            <div style="display:flex;flex-direction:column">
+              <strong>{{ s.name }}</strong>
+              <span class="small-muted" style="margin-top:.18rem">{{ s.email or '' }}</span>
             </div>
-            <div class="context-menu" role="menu">
-              <a href="{{ url_for('stakeholders.view', stakeholder_id=s.id) }}">View</a>
-              <a href="{{ url_for('stakeholders.delete', stakeholder_id=s.id) }}">Delete</a>
+          </td>
+          <td>
+            <div class="small-muted">{{ s.role or '—' }}</div>
+            <div style="font-size:.9rem;color:#374151">{{ s.department or '—' }}</div>
+          </td>
+          <td>
+            <div style="display:flex;gap:.4rem;align-items:center">
+              <div style="width:100%;background:#f3f4f6;border-radius:6px;height:10px;overflow:hidden">
+                <div style="height:100%;background:linear-gradient(90deg,#10b981,#06b6d4);width:{{ (s.importance or 0) * 10 }}%"></div>
+              </div>
+              <div class="small-muted" style="min-width:28px;text-align:right">{{ s.importance if s.importance is not none else 'n/a' }}</div>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;gap:.4rem;align-items:center">
+              <div style="width:100%;background:#f3f4f6;border-radius:6px;height:10px;overflow:hidden">
+                <div style="height:100%;background:linear-gradient(90deg,#f97316,#ef4444);width:{{ (s.influence or 0) * 10 }}%"></div>
+              </div>
+              <div class="small-muted" style="min-width:28px;text-align:right">{{ s.influence if s.influence is not none else 'n/a' }}</div>
+            </div>
+          </td>
+          <td>
+            {% set q = s.mendelow_quadrant %}
+            {% if q == 'Key Player' %}
+              <span class="badge badge-key">Key Player</span>
+            {% elif q == 'Keep Satisfied' %}
+              <span class="badge badge-sat">Keep Satisfied</span>
+            {% elif q == 'Keep Informed' %}
+              <span class="badge badge-inf">Keep Informed</span>
+            {% else %}
+              <span class="badge badge-mon">Monitor</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="row-actions">
+              <a class="action-btn" href="{{ url_for('stakeholders.view', stakeholder_id=s.id) }}">View</a>
+              <a class="action-btn" href="{{ url_for('stakeholders.edit', stakeholder_id=s.id) }}">Edit</a>
+              <form method="post" action="{{ url_for('stakeholders.delete', stakeholder_id=s.id) }}" style="display:inline" onsubmit="return confirm('Delete stakeholder?');">
+                <button class="action-btn" type="submit">Delete</button>
+              </form>
             </div>
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="7">No stakeholders yet.</td></tr>
+        <tr><td colspan="7" class="small-muted">No stakeholders yet. Click "Add stakeholder" to create one.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+
+<script>
+(function(){
+  const input = document.getElementById('stake-search');
+  const tbody = document.getElementById('stake-tbody');
+  input && input.addEventListener('input', ()=>{
+    const q = input.value.trim().toLowerCase();
+    Array.from(tbody.querySelectorAll('tr')).forEach(tr=>{
+      if(!q){ tr.style.display='table-row'; return; }
+      const name = tr.dataset.name || '';
+      const role = tr.dataset.role || '';
+      const dept = tr.dataset.dept || '';
+      const ok = name.includes(q) || role.includes(q) || dept.includes(q);
+      tr.style.display = ok ? 'table-row' : 'none';
+    });
+  });
+})();
+</script>
 {% endblock %}
