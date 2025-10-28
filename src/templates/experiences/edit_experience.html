@@ -1,6 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Edit Experience — ReqSense{% endblock %}
 
+{% block head_extra %}
+<style>
+/* Tag badge styling (consistent with other badges) */
+.tag-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.28rem .5rem;
+  border-radius:999px;
+  background:linear-gradient(180deg,#f8fafc,#eef2ff);
+  border:1px solid rgba(15,23,42,.06);
+  font-size:.85rem;
+  margin:.18rem .25rem;
+}
+.tag-badge button{
+  border:0;background:transparent;color:#6b7280;cursor:pointer;padding:0;margin:0 0 0 .25rem;font-weight:700;
+}
+#tag-input{display:flex;flex-wrap:wrap;gap:.4rem;padding:.45rem;border-radius:8px;border:1px solid rgba(2,6,23,0.04);background:#fff}
+#tag-box{flex:1;border:0;outline:none;padding:.25rem;min-width:120px}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="table-card" style="max-width:980px;margin:1.25rem auto;">
   <div class="table-header">
@@ -8,7 +30,7 @@
     <div><a class="btn secondary" href="{{ url_for('experiences.overview') }}">Back</a></div>
   </div>
 
-  <form method="post" style="padding:1rem;display:grid;gap:1rem">
+  <form method="post" style="padding:1rem;display:grid;gap:1rem" id="edit-experience-form">
     <div class="form-grid">
       <div>
         <div class="form-field">
@@ -49,15 +71,16 @@
 
         <div class="form-field">
           <label style="font-weight:700">Context tags</label>
-          <div id="tag-input" style="display:flex;flex-wrap:wrap;gap:.4rem;padding:.45rem;border-radius:8px;border:1px solid rgba(2,6,23,0.04);background:#fff">
-            <input id="tag-box" type="text" placeholder="Add tag and press Enter" style="flex:1;border:0;outline:none;padding:.25rem;min-width:120px" />
+          <div id="tag-input" aria-live="polite">
+            <input id="tag-box" type="text" placeholder="Add tag and press Enter" />
             {% if experience.context_tags %}
               {% for t in experience.context_tags %}
-                <span class="badge tag-badge">{{ t }}<button type="button" onclick="this.parentElement.remove()">✕</button></span>
+                <span class="tag-badge" data-tag="{{ t|e }}">{{ t }}<button type="button" aria-label="Remove tag">✕</button></span>
               {% endfor %}
             {% endif %}
           </div>
           <input type="hidden" id="context_tags" name="context_tags" value="{{ (experience.context_tags | join(',')) if experience.context_tags else '' }}">
+          <small class="muted">Press Enter or comma to add tags. Remove with the ✕.</small>
         </div>
 
         <div style="margin-top:.6rem">
@@ -74,13 +97,62 @@
 
 <script>
 (function(){
+  // char count
   const ta = document.getElementById('narrative');
   const cc = document.getElementById('char-count');
   if(ta && cc){
-    ta.addEventListener('input', ()=> cc.textContent = ta.value.length + ' / 5000');
-    cc.textContent = (ta.value || '').length + ' / 5000';
+    const upd = ()=> cc.textContent = ta.value.length + ' / 5000';
+    ta.addEventListener('input', upd);
+    upd();
   }
-  // tag handling mirrors submit page – keep same JS if desired
+
+  // tag handling (shared logic for submit/edit)
+  const tagBox = document.getElementById('tag-box');
+  const container = document.getElementById('tag-input');
+  const hidden = document.getElementById('context_tags');
+
+  function refreshHidden(){
+    const tags = Array.from(container.querySelectorAll('.tag-badge')).map(el => el.dataset.tag);
+    hidden.value = tags.join(',');
+  }
+
+  function createBadge(text){
+    const span = document.createElement('span');
+    span.className = 'tag-badge';
+    span.dataset.tag = text;
+    span.textContent = text;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('aria-label','Remove tag');
+    btn.textContent = '✕';
+    btn.addEventListener('click', ()=> { span.remove(); refreshHidden(); });
+    span.appendChild(btn);
+    container.insertBefore(span, tagBox);
+  }
+
+  // initialize any pre-rendered tags (they already exist as elements)
+  Array.from(container.querySelectorAll('.tag-badge')).forEach(b=>{
+    const btn = b.querySelector('button');
+    if(btn) btn.addEventListener('click', ()=> { b.remove(); refreshHidden(); });
+  });
+
+  tagBox.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      const val = tagBox.value.trim();
+      if(!val) return;
+      const exists = Array.from(container.querySelectorAll('.tag-badge')).some(el => el.dataset.tag.toLowerCase() === val.toLowerCase());
+      if(!exists) createBadge(val);
+      tagBox.value = '';
+      refreshHidden();
+    } else if(e.key === 'Backspace' && tagBox.value===''){
+      const badges = container.querySelectorAll('.tag-badge');
+      if(badges.length) { badges[badges.length-1].remove(); refreshHidden(); }
+    }
+  });
+
+  // ensure hidden is synced before submit (extra safety)
+  document.getElementById('edit-experience-form').addEventListener('submit', ()=> refreshHidden());
 })();
 </script>
 {% endblock %}

@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Submit Experience — ReqSense{% endblock %}
 
+{% block head_extra %}
+<style>
+.tag-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.28rem .5rem;
+  border-radius:999px;
+  background:linear-gradient(180deg,#f8fafc,#eef2ff);
+  border:1px solid rgba(15,23,42,.06);
+  font-size:.85rem;
+  margin:.18rem .25rem;
+}
+.tag-badge button{border:0;background:transparent;color:#6b7280;cursor:pointer;padding:0;margin:0 0 0 .25rem;font-weight:700;}
+#tag-input{display:flex;flex-wrap:wrap;gap:.4rem;padding:.45rem;border-radius:8px;border:1px solid rgba(2,6,23,0.04);background:#fff}
+#tag-box{flex:1;border:0;outline:none;padding:.25rem;min-width:120px}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="table-card" style="max-width:980px;margin:1.25rem auto;">
   <div class="table-header">
@@ -10,7 +29,7 @@
     </div>
   </div>
 
-  <form method="post" style="padding:1rem;display:grid;gap:1rem">
+  <form method="post" style="padding:1rem;display:grid;gap:1rem" id="submit-experience-form">
     <div class="form-grid">
       <div>
         <div class="form-field">
@@ -51,10 +70,11 @@
 
         <div class="form-field">
           <label style="font-weight:700">Context tags</label>
-          <div id="tag-input" style="display:flex;flex-wrap:wrap;gap:.4rem;padding:.45rem;border-radius:8px;border:1px solid rgba(2,6,23,0.04);background:#fff">
-            <input id="tag-box" type="text" placeholder="Add tag and press Enter" style="flex:1;border:0;outline:none;padding:.25rem;min-width:120px" />
+          <div id="tag-input" aria-live="polite">
+            <input id="tag-box" type="text" placeholder="Add tag and press Enter" />
           </div>
           <input type="hidden" id="context_tags" name="context_tags" value="">
+          <small class="muted">Press Enter or comma to add tags. Remove with the ✕.</small>
         </div>
 
         <div style="margin-top:.6rem">
@@ -71,47 +91,55 @@
 
 <script>
 (function(){
+  // char count
   const ta = document.getElementById('narrative');
   const cc = document.getElementById('char-count');
   if(ta && cc){
-    ta.addEventListener('input', ()=> cc.textContent = ta.value.length + ' / 5000');
-    cc.textContent = (ta.value || '').length + ' / 5000';
+    const upd = ()=> cc.textContent = ta.value.length + ' / 5000';
+    ta.addEventListener('input', upd);
+    upd();
   }
 
-  // simple tag input
+  // tag handling (same as edit)
   const tagBox = document.getElementById('tag-box');
   const container = document.getElementById('tag-input');
   const hidden = document.getElementById('context_tags');
 
   function refreshHidden(){
-    const tags = Array.from(container.querySelectorAll('.tag-badge')).map(el => el.textContent.replace('✕','').trim());
+    const tags = Array.from(container.querySelectorAll('.tag-badge')).map(el => el.dataset.tag);
     hidden.value = tags.join(',');
   }
 
-  function addTag(text){
-    text = (text||'').trim();
-    if(!text) return;
-    const exists = Array.from(container.querySelectorAll('.tag-badge')).some(el => el.textContent.replace('✕','').trim().toLowerCase()===text.toLowerCase());
-    if(exists) return;
+  function createBadge(text){
     const span = document.createElement('span');
-    span.className = 'badge tag-badge';
-    span.style.display = 'inline-flex';
-    span.style.alignItems = 'center';
-    span.style.gap = '.5rem';
+    span.className = 'tag-badge';
+    span.dataset.tag = text;
     span.textContent = text;
     const btn = document.createElement('button');
-    btn.type = 'button'; btn.textContent = '✕';
-    btn.style.border = '0'; btn.style.background = 'transparent'; btn.style.cursor = 'pointer'; btn.style.marginLeft = '.45rem';
+    btn.type = 'button';
+    btn.setAttribute('aria-label','Remove tag');
+    btn.textContent = '✕';
     btn.addEventListener('click', ()=> { span.remove(); refreshHidden(); });
     span.appendChild(btn);
     container.insertBefore(span, tagBox);
-    refreshHidden();
   }
 
   tagBox.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' || e.key === ','){ e.preventDefault(); addTag(tagBox.value); tagBox.value=''; }
-    else if(e.key === 'Backspace' && tagBox.value===''){ const badges = container.querySelectorAll('.tag-badge'); if(badges.length) { badges[badges.length-1].remove(); refreshHidden(); } }
+    if(e.key === 'Enter' || e.key === ','){
+      e.preventDefault();
+      const val = tagBox.value.trim();
+      if(!val) return;
+      const exists = Array.from(container.querySelectorAll('.tag-badge')).some(el => el.dataset.tag.toLowerCase() === val.toLowerCase());
+      if(!exists) createBadge(val);
+      tagBox.value = '';
+      refreshHidden();
+    } else if(e.key === 'Backspace' && tagBox.value===''){
+      const badges = container.querySelectorAll('.tag-badge');
+      if(badges.length) { badges[badges.length-1].remove(); refreshHidden(); }
+    }
   });
+
+  document.getElementById('submit-experience-form').addEventListener('submit', ()=> refreshHidden());
 })();
 </script>
 {% endblock %}
